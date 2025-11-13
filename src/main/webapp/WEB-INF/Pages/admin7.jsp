@@ -1,0 +1,150 @@
+<%-- <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Registration Page</title>
+ 
+<!-- Chart.js CDN for CandidateAnalytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+    }
+    .main-container {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .header {
+        height: 90px;
+        /* background: #1d1d1d;
+        color: white; */
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+    }
+    .content-wrapper {
+        display: flex;
+        flex: 1;
+    }
+    .sidebar {
+        width: 11%;
+        background: #2178BD;
+        padding: 1rem;
+        color: white;
+    }
+    .content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+        color: white;
+    }
+</style>
+</head>
+<body>
+ 
+<div class="main-container">
+ 
+    <!-- Dashboard/Header -->
+    <div class="header">
+        <jsp:include page="header.jsp" />
+    </div>
+ 
+    <div class="content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <jsp:include page="sidebar.jsp" />
+        </div>
+ 
+        <!-- Candidate Analytics Content -->
+        <div class="content" >
+             
+            <jsp:include page="CandidateAnalytics.jsp" />
+        </div>
+    </div>
+ 
+</div>
+ 
+</body>
+</html>
+--%>
+ 
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Exam</title>
+ 
+<!-- Chart.js CDN for CandidateAnalytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+    }
+    .main-container {
+        height: 100vh; /* Full screen height */
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .header {
+        height: 15vh; /* 15% of screen height */
+        display: flex;
+        align-items: center;
+    }
+    .content-wrapper {
+        height: 83vh; /* 84% of screen height */
+        display: flex;
+        flex-direction: row;
+    }
+    .sidebar {
+        width: 13%;
+        background: #2178BD;
+        padding: 1rem;
+        color: white;
+        /* height: 100%; */ /* Full height of content-wrapper */
+        overflow-y: auto; /* Allow scrolling if sidebar content overflows */
+    }
+    .content {
+        flex: 1;
+        padding-left: 2rem;
+        height: 100%; /* Full height of content-wrapper */
+        overflow-y: auto; /* Allow scrolling for content */
+    }
+</style>
+</head>
+<body>
+ 
+<div class="main-container">
+ 
+    <!-- Dashboard/Header -->
+    <div class="header">
+        <jsp:include page="header.jsp" />
+    </div>
+ 
+    <div class="content-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <jsp:include page="sidebar.jsp" />
+        </div>
+ 
+        <!-- Candidate Analytics Content -->
+        <div class="content">
+            <jsp:include page="manageExam.jsp" />
+        </div>
+    </div>
+ 
+</div>
+ 
+</body>
+</html>
+ 

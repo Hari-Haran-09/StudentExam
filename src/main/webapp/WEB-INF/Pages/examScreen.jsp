@@ -69,64 +69,83 @@ pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; }
 </div>
 
 <!-- Hidden Inputs for Timer and User Data -->
+<input type="hidden" id="setName" value="${setName}">
 <input type="hidden" id="languageName" value="${languageName}">
 <input type="hidden" id="email" value="${sessionScope.userEmail}">
 
 <!-- MCQ & Coding Buttons -->
 <div style="width: 95%; display: flex; justify-content: space-between; margin: auto">
   <div style="display:flex; width:30%; justify-content:space-around; margin-left: 1%">
-    <button type="button" onclick="loadMCQSection()" style="padding:10px 20px; background:#2FADE4; color:white; border-radius:5px; border: none; cursor: pointer">MCQ</button>
-    <button type="button" onclick="loadCodingSection()" style="padding:10px 20px; background:#2FADE4; color:white; border-radius:5px; border: none; cursor: pointer">Coding</button>
+    <button id="mcqBtn" type="button" onclick="loadMCQSection()" style="padding:10px 20px; background:#2FADE4; color:white; border-radius:5px; border: none; cursor: pointer">MCQ</button>
+    <button id="codingBtn" type="button" onclick="loadCodingSection()" style="padding:10px 20px; background:#2FADE4; color:white; border-radius:5px; border: none; cursor:not-allowed" hidden>Coding</button>
   </div>
 </div>
 
 <!-- MCQ Section Container -->
 <div id="mcq-section" class="exam-section active">
     <c:if test="${not empty mcq}">
-    <div style="display:flex; width:90%; margin:auto; justify-content:space-between;">
-        <div style="width:65%;">
-            <h3>MCQ Questions</h3>
-            <c:forEach var="q" items="${mcq}">
-                <div class="mcq-question" id="question-${q.id}">
-                    <p style="white-space: pre-wrap;"><strong>Q ${q.id}:</strong> ${q.question}</p>
-                    <ul>
-                        <c:forEach var="opt" items="${fn:split(q.optionText, ',')}">
-                            <li>
-                                <input type="radio" name="answer-${q.id}" value="${fn:substring(opt.trim(), 0, 1)}" onclick="markAnswered(${q.id})">
-                                <!--<label>${opt.trim()}</label>-->
-								<label><c:out value="${opt.trim()}" /></label>
-                            </li>
-                        </c:forEach>
-                    </ul>
-                    <div style="display:flex; justify-content:space-between; width:60%; margin-top:10px;">
-                        <button class="div1" onclick="showPrevious(${q.id}); return false;" style="background:#1E6C8D; color:white; padding: 9px 23px"><img src="${pageContext.request.contextPath}/images/leftArrow.png" alt="Logo" width="10" height="10"> Previous</button>
-                        <button class="div1" onclick="saveAndNext(${q.id}); return false;" style="background:#00BB19; color:white; padding: 9px 17px">Save & Next <img src="${pageContext.request.contextPath}/images/arrow.png" alt="Logo" width="10" height="10"></button>
+        <div style="display:flex; width:90%; margin:auto; justify-content:space-between;">
+            <div style="width:65%;">
+                <h3>MCQ Questions</h3>
+                <c:forEach var="q" items="${mcq}">
+                    <div class="mcq-question" id="question-${q.id}">
+                        <p style="white-space: pre-wrap;"><strong>Q ${q.id}:</strong> <c:out value="${q.question}"/></p>
+
+                        <!-- create the cleaned variable HERE -->
+                        <c:set var="cleaned" value="${fn:replace(q.optionText, ', a.', '###a.')}" />
+                        <c:set var="cleaned" value="${fn:replace(cleaned, ', b.', '###b.')}" />
+                        <c:set var="cleaned" value="${fn:replace(cleaned, ', c.', '###c.')}" />
+                        <c:set var="cleaned" value="${fn:replace(cleaned, ', d.', '###d.')}" />
+
+                        <ul>
+                            <c:forEach var="opt" items="${fn:split(cleaned, '###')}">
+                                <li>
+                                    <input type="radio"
+                                           name="answer-${q.id}"
+                                           value="${fn:substring(opt.trim(), 0, 1)}"
+                                           onclick="markAnswered(${q.id})">
+
+                                    <label><c:out value="${opt.trim()}" /></label>
+                                </li>
+                            </c:forEach>
+                        </ul>
+
+                        <div style="display:flex; justify-content:space-between; width:60%; margin-top:10px;">
+                            <button class="div1" onclick="showPrevious(${q.id}); return false;" style="background:#1E6C8D; color:white; padding: 9px 23px">
+                                <img src="${pageContext.request.contextPath}/images/leftArrow.png" width="10" height="10"> Previous
+                            </button>
+
+                            <button class="div1" onclick="saveAndNext(${q.id}); return false;" style="background:#00BB19; color:white; padding: 9px 17px">
+                                Save & Next <img src="${pageContext.request.contextPath}/images/arrow.png" width="10" height="10">
+                            </button>
+                        </div>
+
                     </div>
-                </div>
-            </c:forEach>
-        </div>
-        <div style="width:30%; text-align:center">
-            <div style="width: 80%; margin: auto;">
-                <div style="width: 80%; display: flex; flex-wrap: wrap; justify-content: space-between; margin: auto">
-                    <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
-                        <p>Answered</p>
-                        <div style="width: 9.5%; height: 15px; background-color: green"></div>
-                    </div>
-                    <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
-                        <p>Viewed</p>
-                        <div style="width: 9.5%; height: 15px; background-color: red"></div>
-                    </div>
-                    <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
-                        <p>Not Viewed</p>
-                        <div style="width: 9.5%; height: 15px; background-color: gray"></div>
-                    </div>
-                </div>
+                </c:forEach>
             </div>
-            <c:forEach var="q" items="${mcq}">
-                <div class="question-id not-viewed" id="qid-${q.id}" onclick="showMCQ(${q.id})">${q.id}</div>
-            </c:forEach>
+            
+            <div style="width:30%; text-align:center">
+                <div style="width: 80%; margin: auto;">
+                    <div style="width: 80%; display: flex; flex-wrap: wrap; justify-content: space-between; margin: auto">
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
+                            <p>Answered</p>
+                            <div style="width: 9.5%; height: 15px; background-color: green"></div>
+                        </div>
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
+                            <p>Viewed</p>
+                            <div style="width: 9.5%; height: 15px; background-color: red"></div>
+                        </div>
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; width: 40%">
+                            <p>Not Viewed</p>
+                            <div style="width: 9.5%; height: 15px; background-color: gray"></div>
+                        </div>
+                    </div>
+                </div>
+                <c:forEach var="q" items="${mcq}">
+                    <div class="question-id not-viewed" id="qid-${q.id}" onclick="showMCQ(${q.id})">${q.id}</div>
+                </c:forEach>
+            </div>
         </div>
-    </div>
     </c:if>
 </div>
 
@@ -224,11 +243,7 @@ pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; }
                     <div id="codeContainer-easy-${loop.index}" class="code-container" style="width: 100%"
                          data-question-id="easy-${loop.index}">
                         <div style="display: flex; justify-content: flex-end; padding-right: 3%; padding-top: 5px">
-                            <select id="languageNameSelect-easy-${loop.index}" name="languageName" required class="select" style="margin-bottom: 10px;">
-                                <option value="" disabled selected>Select Coding Language</option>
-								<option value="Java">Java</option>
-								<option value="Python">Python</option>
-                            </select>
+                            <div style="text-align: center; margin: 0px">Coding Language: ${languageName} </div>
                         </div>
                         <div style="width: 97%; display: flex; justify-content: space-evenly; margin: auto">
                             <textarea id="codeArea-easy-${loop.index}" rows="15" cols="80"
@@ -236,7 +251,7 @@ pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; }
                                       style="width: 99%; font-family: monospace; font-size: 14px; color: white; background-color: black; outline: none; padding: 10px"></textarea>
                         </div>
                         <div id="inputContainer-easy-${loop.index}" style="width:97%; margin:auto; margin-bottom:10px; background-color: black; display: ${not empty q.easyInput ? 'block' : 'none'};">
-                            <label style="color:white;">Custom Input (Optional):</label>
+                            <label style="color:white;">Please provide the given Input here:</label>
                             <textarea id="inputArea-easy-${loop.index}" rows="2" cols="80" style="width:99%; font-family:monospace; color: white; background-color: black;" placeholder="Enter custom input here if you want to test with different inputs"></textarea>
                         </div>
                         <div style="margin-top:10px; width: 97%; display: flex; justify-content: flex-end">
@@ -253,11 +268,7 @@ pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; }
                     <div id="codeContainer-medium-${loop.index}" class="code-container" style="width: 100%"
                          data-question-id="medium-${loop.index}">
                         <div style="display: flex; justify-content: flex-end; padding-right: 3%; padding-top: 5px">
-                            <select id="languageNameSelect-medium-${loop.index}" name="languageName" required class="select" style="margin-bottom: 10px;">
-                                <option value="" disabled selected>Select Coding Language</option>
-								<option value="Java">Java</option>
-								<option value="Python">Python</option>
-                            </select>
+						<div style="text-align: center; margin: 0px">Coding Language: ${languageName} </div>
                         </div>
                         <div style="width: 97%; display: flex; justify-content: space-evenly; margin: auto">
                             <textarea id="codeArea-medium-${loop.index}" rows="15" cols="80"
@@ -282,12 +293,7 @@ pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; }
                     <div id="codeContainer-hard-${loop.index}" class="code-container" style="width: 100%"
                          data-question-id="hard-${loop.index}">
                         <div style="display: flex; justify-content: flex-end; padding-right: 3%; padding-top: 5px">
-                            <select id="languageNameSelect-hard-${loop.index}" name="languageName" required class="select" style="margin-bottom: 10px;">
-                                <option value="" disabled selected>Select Coding Language</option>
-								<option value="Java">Java</option>
-								<option value="Python">Python</option>
-                            </select>
-                        </div>
+                         <div style="text-align: center; margin: 0px">Coding Language: ${languageName} </div>                        </div>
                         <div style="width: 97%; display: flex; justify-content: space-evenly; margin: auto">
                             <textarea id="codeArea-hard-${loop.index}" rows="15" cols="80"
                                       placeholder="Write your code here..."
@@ -355,107 +361,122 @@ function hideLoading() {
 }
 
 function loadMCQSection() {
+
     console.log("Loading MCQ section...");
-    //const newUrl = `http://localhost:4049/student/examScreen/mcq?languageName=${languageName}`;
-	const newUrl = `<%=request.getContextPath()%>/student/examScreen/mcq?languageName=${languageName}`;
-    window.history.pushState({}, '', newUrl);
-    
+
     showLoading();
+
     currentSection = 'mcq';
-    
-    fetch(newUrl, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-		console.log("final response is........", response);
-        return response.text();
-    })
-    .then(html => {
-		console.log("📄 Response HTML content:\n", html);
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        
-        const mcqContent = tempDiv.querySelector('#mcq-section');
-        
-        if (mcqContent) {
-            document.getElementById('mcq-section').innerHTML = mcqContent.innerHTML;
-        } else {
-            const questionsContent = extractMCQContent(html);
-            if (questionsContent) {
-                document.getElementById('mcq-section').innerHTML = questionsContent;
-            } else {
-                const cleanedHtml = removeDuplicateHeaders(html);
-                document.getElementById('mcq-section').innerHTML = cleanedHtml;
-            }
-        }
-        
-        showSection('mcq');
-        initializeMCQSection();
-        hideLoading();
-    })
-    .catch(error => {
-        console.error('Error loading MCQ section:', error);
-        hideLoading();
-        alert('Error loading MCQ section. Please try again.');
-    });
+
+    showSection('mcq');
+
+    initializeMCQSection();
+
+    const codingBtn =
+        document.getElementById('codingBtn');
+
+    if (codingBtn) {
+
+        codingBtn.hidden = false;
+
+        codingBtn.style.background =
+            "#2FADE4";
+
+        codingBtn.style.cursor =
+            "pointer";
+    }
+
+    hideLoading();
 }
 
-function loadCodingSection() {
+async function loadCodingSection() {
+
     if (currentSection === 'coding') return;
-    
-    if (!areAllMCQsAnswered()) {
-        alert("Please select options for all MCQ questions before accessing the coding section.");
+
+    // Save current coding answer if exists
+    if (currentCodingQuestionId) {
+        saveCodingAnswer(currentCodingQuestionId);
+    }
+
+    // Check whether all MCQs are answered
+    const allAnswered = areAllMCQsAnswered();
+
+    if (!allAnswered) {
+
+        const unansweredQuestions = [];
+
+        mcqQuestions.forEach(q => {
+
+            let qid = q.id.split('-')[1];
+
+            let radios = document.querySelectorAll(
+                '#question-' + qid + ' input[type=radio]'
+            );
+
+            let answered = Array.from(radios)
+                .some(r => r.checked);
+
+            if (!answered) {
+                unansweredQuestions.push(qid);
+            }
+        });
+
+        alert(
+            `Please answer all MCQ questions before accessing coding section.\n\nUnanswered questions: ${unansweredQuestions.join(', ')}`
+        );
+
         return;
     }
-    
+
     showLoading();
+
     currentSection = 'coding';
-    
-    //fetch('http://localhost:4049/student/examScreen/coding?languageName=${languageName}', {
-		fetch('<%=request.getContextPath()%>/student/examScreen/coding?languageName=${languageName}', {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+
+    // Save MCQ answers into session storage
+    mcqQuestions.forEach(q => {
+
+        let qid = q.id.split('-')[1];
+
+        let radios = document.querySelectorAll(
+            '#question-' + qid + ' input[type=radio]'
+        );
+
+        let selected = Array.from(radios)
+            .find(r => r.checked);
+
+        if (selected) {
+
+            sessionStorage.setItem(
+                'mcq-' + qid + '_' + lang + '_' + email,
+                selected.value
+            );
         }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.text();
-    })
-    .then(html => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-        const codingContent = tempDiv.querySelector('#coding-section');
-        
-        if (codingContent) {
-            document.getElementById('coding-section').innerHTML = codingContent.innerHTML;
-        } else {
-            const questionsContent = extractCodingContent(html);
-            if (questionsContent) {
-                document.getElementById('coding-section').innerHTML = questionsContent;
-            } else {
-                const cleanedHtml = removeDuplicateHeaders(html);
-                document.getElementById('coding-section').innerHTML = cleanedHtml;
-            }
-        }
-        
-        showSection('coding');
-        initializeCodingSection();
-        hideLoading();
-    })
-    .catch(error => {
-        console.error('Error loading Coding section:', error);
-        hideLoading();
-        alert('Error loading Coding section. Please try again.');
     });
+
+    // If coding section already loaded, just show it
+    const codingSection = document.getElementById('coding-section');
+
+    // Directly show coding section
+    showSection('coding');
+
+    // Initialize coding editors/questions
+    initializeCodingSection();
+
+    // Hide loading
+    hideLoading();
+
+    // Update navigation button UI
+    const mcqBtn = document.getElementById('mcqBtn');
+    const codingBtn = document.getElementById('codingBtn');
+
+    if (mcqBtn && codingBtn) {
+
+        codingBtn.style.background = "#2FADE4";
+        codingBtn.style.cursor = "pointer";
+
+        mcqBtn.style.background = "#2FADE4";
+        mcqBtn.style.cursor = "pointer";
+    }
 }
 
 function extractMCQContent(html) {
@@ -782,7 +803,8 @@ function setupSecurityMeasures() {
 function logViolation(type) {
     console.warn('Exam violation detected:', type);
     
-    fetch('http://localhost:4049/student/logViolation', {
+    //fetch('http://localhost:4049/student/logViolation', {
+		fetch('<%=request.getContextPath()%>/student/logViolation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -811,21 +833,31 @@ function initializeSharedTimer() {
         startSharedTimer();
         meetingTimeElem.textContent = formatTime(totalSeconds);
     } else {
-        const url = 'http://localhost:4049/student/manageExams/byLanguage/' + lang;
+        //const url = 'http://localhost:4049/student/manageExams/byLanguage/' + lang;
+		const url = '<%=request.getContextPath()%>/student/manageExams/byLanguage/' + lang;
         fetch(url)
         .then(res => {
             if (!res.ok) throw new Error("HTTP error! Status: " + res.status);
             return res.json();
         })
         .then(data => {
-            if (data && data.length > 0) {
-                let meetingTime = data[0].meetingTime;
-                let parts = meetingTime.split(":");
-                totalSeconds = parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60;
-                startSharedTimer();
-            } else {
-                meetingTimeElem.textContent = "Not Available";
-            }
+			if (data && data.length > 0) {
+									                let meetingTime = data[0].meetingTime.trim();
+									                let totalMinutes = 0;
+									                if (meetingTime.includes(":")) {
+									                    const parts = meetingTime.split(":");
+									                    const hours = parseInt(parts[0]) || 0;
+									                    const minutes = parseInt(parts[1]) || 0;
+									                    totalMinutes = hours * 60 + minutes;
+									                }
+									                else {
+									                    totalMinutes = parseInt(meetingTime) || 0;
+									                }
+									                totalSeconds = totalMinutes * 60;
+									                startSharedTimer();
+									            } else {
+									                meetingTimeElem.textContent = "Not Available";
+									            }
         })
         .catch(err => {
             console.error("Error fetching meeting time:", err);
@@ -908,12 +940,44 @@ function showMCQ(id) {
     updateQuestionStatus(id);
 }
 
+//function saveAndNext(id){
+  //  markAnswered(id);
+   // if(currentIndex < mcqQuestions.length-1){
+       // mcqQuestions[currentIndex].style.display='none';
+      //  currentIndex++;
+        //showMCQ(mcqQuestions[currentIndex].id.split('-')[1]);
+    //}
+//}
+
 function saveAndNext(id){
+    // First, save the current question
     markAnswered(id);
+    
     if(currentIndex < mcqQuestions.length-1){
+        // Not last question - navigate to next
         mcqQuestions[currentIndex].style.display='none';
         currentIndex++;
         showMCQ(mcqQuestions[currentIndex].id.split('-')[1]);
+    } else {
+        // Last question reached - show confirmation
+        const allAnswered = areAllMCQsAnswered();
+        
+        if (allAnswered) {
+			loadCodingSection();
+            //if (confirm("You have completed all MCQ questions! Would you like to proceed to the Coding section?")) {
+              //  loadCodingSection();
+            //}
+        } else {
+            alert("Please answer all MCQ questions before proceeding to the Coding section.");
+            
+            // Find and highlight unanswered questions
+            const unansweredIds = [];
+            mcqQuestions.forEach(q => {
+                let qid = q.id.split('-')[1];
+                let radios = document.querySelectorAll('#question-' + qid + ' input[type=radio]');
+                let answered = Array.from(radios).some(r => r.checked);               
+            });
+        }
     }
 }
 
@@ -950,58 +1014,75 @@ function updateQuestionStatus(id) {
     }
 }
 
+//function areAllMCQsAnswered() {
+   // const allMCQsAnswered = mcqQuestions.every(q => {
+      //  let qid = q.id.split('-')[1];
+      //  let radios = document.querySelectorAll('#question-' + qid + ' input[type=radio]');
+       // return Array.from(radios).some(r => r.checked);
+   // });
+
+   // return allMCQsAnswered;
+//}
+
 function areAllMCQsAnswered() {
-    const allMCQsAnswered = mcqQuestions.every(q => {
+    if (!mcqQuestions || mcqQuestions.length === 0) return true;
+    
+    return mcqQuestions.every(q => {
         let qid = q.id.split('-')[1];
         let radios = document.querySelectorAll('#question-' + qid + ' input[type=radio]');
         return Array.from(radios).some(r => r.checked);
     });
-
-    return allMCQsAnswered;
 }
 
 // ===== ENHANCED CODING MARKS CALCULATION =====
-function calculateCodingMarks() {
+async function fetchCodingMarksConfig() {
+    const url = '<%=request.getContextPath()%>/student/manageExams/byLanguage/' + lang;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to fetch coding marks config");
+
+    const data = await response.json();
+
+    // Always take first item from the list
+    return data.length > 0 ? data[0] : null;
+}
+
+async function calculateCodingMarks() {
     const codingAnswers = sessionStorage.getItem('codingAnswers_' + lang + '_' + email);
     let codingMarks = 0;
 
-    if (codingAnswers) {
-        const answers = JSON.parse(codingAnswers);
-        console.log("=== CALCULATING CODING MARKS ===");
-        console.log("Total coding answers:", answers.length);
-        
-        answers.forEach(answer => {
-            console.log("Checking answer for:", answer.questionId);
-            console.log("Output:", answer.output);
-            console.log("Level:", answer.level);
-            
-            if (answer.output && answer.output.includes('ALL TESTS PASSED')) {
-                if (answer.level === 'easy') {
-                    codingMarks += 5;
-                    console.log("✅ Easy question passed: +5 marks");
-                } else if (answer.level === 'medium') {
-                    codingMarks += 10;
-                    console.log("✅ Medium question passed: +10 marks");
-                } else if (answer.level === 'hard') {
-                    codingMarks += 15;
-                    console.log("✅ Hard question passed: +15 marks");
-                }
-            } else {
-                console.log("❌ Question not passed or no output");
-            }
-        });
-        
-        console.log("Total Coding Marks:", codingMarks);
-        console.log("=== END CODING MARKS CALCULATION ===");
-    } else {
+    if (!codingAnswers) {
         console.log("No coding answers found for marks calculation");
+        return 0;
     }
-    
+
+    const marksConfig = await fetchCodingMarksConfig(); // Must return Java-style keys
+
+    const answers = JSON.parse(codingAnswers);
+    console.log("=== CALCULATING CODING MARKS ===");
+
+    answers.forEach(answer => {
+        console.log("Checking:", answer.questionId, answer.output, answer.level);
+
+        if (answer.output && answer.output.includes('ALL TESTS PASSED')) {
+
+            if (answer.level === 'easy') {
+                codingMarks += marksConfig.easyLevelMarks;
+            } else if (answer.level === 'medium') {
+                codingMarks += marksConfig.mediumLevelMarks;
+            } else if (answer.level === 'hard') {
+                codingMarks += marksConfig.hardLevelMarks;
+            }
+        }
+    });
+
+    console.log("Total Coding Marks:", codingMarks);
     return codingMarks;
 }
 
+
 // ===== SUBMIT COMPLETE EXAM (MCQ + CODING) =====
-function submitAllExam() {
+async function submitAllExam() {
     if (!confirm("Are you sure you want to submit the complete exam? This will end your exam session.")) return;
 
     let allAnswers = [];
@@ -1013,7 +1094,7 @@ function submitAllExam() {
     });
 
     // Calculate coding marks before submission
-    const codingMarks = calculateCodingMarks();
+    const codingMarks =  await calculateCodingMarks();
     const codingAnswers = sessionStorage.getItem('codingAnswers_' + lang + '_' + email);
 
     console.log("=== FINAL SUBMISSION SUMMARY ===");
@@ -1024,12 +1105,17 @@ function submitAllExam() {
 
     // First save MCQ answers
     //fetch('http://localhost:4049/student/saveAll?email=' + email +
-	fetch('<%=request.getContextPath()%>/student/saveAll?email=' + email +
-          '&languageName=' + lang, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(allAnswers)
-    })
+	fetch('<%=request.getContextPath()%>/student/saveAll?email='
+    + encodeURIComponent(email)
+    + '&languageName=' + encodeURIComponent(lang)
+    + '&questionSet=' + encodeURIComponent(setName), {
+
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(allAnswers)
+})
     .then(res => res.text())
     .then(data => {
         console.log("MCQ answers saved successfully");
@@ -1037,12 +1123,18 @@ function submitAllExam() {
         // Then save coding answers with marks if they exist
         if (codingAnswers) {
             //return fetch('http://localhost:4049/student/saveCoding?email=' + email +
-			return fetch('<%=request.getContextPath()%>/student/saveCoding?email=' + email +
-                  '&languageName=' + lang + '&codingMarks=' + codingMarks, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: codingAnswers
-            })
+			returnfetch('<%=request.getContextPath()%>/student/saveCoding?email='
+    + encodeURIComponent(email)
+    + '&languageName=' + encodeURIComponent(lang)
+    + '&questionSet=' + encodeURIComponent(setName)
+    + '&codingMarks=' + codingMarks, {
+
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: codingAnswers
+})
             .then(res => res.text())
             .then(data => {
                 console.log("Coding answers saved with marks:", codingMarks);
@@ -1063,12 +1155,18 @@ function submitAllExam() {
         // Even if MCQ fails, try to save coding
         if (codingAnswers) {
             //fetch('http://localhost:4049/student/saveCoding?email=' + email +
-			fetch('<%=request.getContextPath()%>/student/saveCoding?email=' + email +
-                  '&languageName=' + lang + '&codingMarks=' + codingMarks, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: codingAnswers
-            })
+			fetch('<%=request.getContextPath()%>/student/saveCoding?email='
+    + encodeURIComponent(email)
+    + '&languageName=' + encodeURIComponent(lang)
+    + '&questionSet=' + encodeURIComponent(setName)
+    + '&codingMarks=' + codingMarks, {
+
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: codingAnswers
+})
             .then(res => res.text())
             .then(data => {
                 console.log("Coding answers saved after MCQ error");
@@ -1088,15 +1186,16 @@ function submitAllExam() {
 let currentCodingQuestionId = null;
 
 function initializeCodingSection() {
-    // Setup language select change listeners for static dropdown
-    document.querySelectorAll('.code-container select').forEach(select => {
-        select.addEventListener("change", function () {
-            const selectedLang = this.value;
-            const containerId = this.id.split("languageNameSelect-")[1];
-            const codeArea = document.getElementById("codeArea-" + containerId);
 
-            // Auto-populate Java template if Java is selected
-            if (selectedLang === "Java" && (!codeArea.value || codeArea.value.trim() === "")) {
+    const selectedLang = document.getElementById("languageName").value;
+
+    // Insert template automatically if editor is empty
+    document.querySelectorAll('.code-container textarea[id^="codeArea-"]').forEach(codeArea => {
+
+        if (!codeArea.value || codeArea.value.trim() === "") {
+
+            if (selectedLang === "Java") {
+
                 codeArea.value =
 `public class Main {
 
@@ -1106,26 +1205,29 @@ function initializeCodingSection() {
 
 }`;
             }
-            // Auto-populate Python template if Python is selected
-            else if (selectedLang === "Python" && (!codeArea.value || codeArea.value.trim() === "")) {
+
+            else if (selectedLang === "Python") {
+
                 codeArea.value = `# write your code here`;
             }
-            
-            saveCodingAnswer(containerId);
-        });
+        }
     });
 
-    // Auto-save coding when user stops typing or changes language
-    document.querySelectorAll('.code-container textarea, .code-container select').forEach(elem => {
+    // Auto-save coding when user types
+    document.querySelectorAll('.code-container textarea[id^="codeArea-"]').forEach(elem => {
+
         elem.addEventListener('input', () => {
+
             const questionId = elem.id.split('-').slice(1).join('-');
+
             if (questionId) {
                 saveCodingAnswer(questionId);
             }
+
         });
     });
 
-    // Show easy questions by default
+    // Show easy questions first
     showCoding('easy');
 }
 
@@ -1176,7 +1278,7 @@ function saveCodingAnswer(questionId) {
     const level = questionId.split('-')[0];
     const questionText = questionElement?.querySelector('.question-content')?.textContent.trim() || '';
     const code = document.getElementById('codeArea-' + questionId)?.value || '';
-    const language = document.getElementById('languageNameSelect-' + questionId)?.value || '';
+	const language = document.getElementById("languageName").value;
     const input = document.getElementById('inputArea-' + questionId)?.value || '';
     const output = document.getElementById('outputBox-' + questionId)?.textContent || '';
 
@@ -1213,7 +1315,7 @@ function saveCodingAnswer(questionId) {
 }
 
 // ===== ENHANCED CODING SUBMISSION =====
-function submitCoding() {
+async function submitCoding() {
     if (!confirm("Are you sure you want to submit the coding answers? You can continue with MCQ questions.")) return;
 
     // Force save current coding answer before submission
@@ -1225,7 +1327,7 @@ function submitCoding() {
     
     if (codingAnswers && codingAnswers !== "[]") {
         // Calculate coding marks based on passed test cases
-        const codingMarks = calculateCodingMarks();
+        const codingMarks = await calculateCodingMarks();
 
         console.log("=== CODING SUBMISSION ===");
         console.log("Email:", email);
@@ -1235,12 +1337,18 @@ function submitCoding() {
         console.log("=== END CODING SUBMISSION ===");
         
         //fetch('http://localhost:4049/student/saveCoding?email=' + email +
-		fetch('<%=request.getContextPath()%>/student/saveCoding?email=' + email +
-              '&languageName=' + lang + '&codingMarks=' + codingMarks, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: codingAnswers
-        })
+		fetch('<%=request.getContextPath()%>/student/saveCoding?email='
+    + encodeURIComponent(email)
+    + '&languageName=' + encodeURIComponent(lang)
+    + '&questionSet=' + encodeURIComponent(setName)
+    + '&codingMarks=' + codingMarks, {
+
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: codingAnswers
+})
         .then(res => res.text())
         .then(data => {
             alert("Coding answers submitted successfully! Marks: " + codingMarks);
@@ -1263,7 +1371,7 @@ async function runCode(questionId) {
 
     const codeArea = document.getElementById('codeArea-' + questionId);
     let code = codeArea?.value.trim();
-    const langSelect = document.getElementById('languageNameSelect-' + questionId)?.value;
+	const langSelect = document.getElementById("languageName").value;
     const output = document.getElementById('outputBox-' + questionId);
     const inputContainer = document.getElementById('inputContainer-' + questionId);
     const stdin = document.getElementById('inputArea-' + questionId)?.value.trim();
@@ -1312,7 +1420,7 @@ async function runCode(questionId) {
     console.log("Cleaned Expected Output:", cleanExpectedOutput);
 
     // Auto-add Scanner import for Java if needed
-    if (langSelect === "Java" && stdin) {
+     if (langSelect === "Java" && stdin) {
         if (!code.includes("Scanner") && !code.includes("java.util.Scanner")) {
             code = code.replace(
                 /public static void main\s*\(.*?\)\s*\{/,
@@ -1332,7 +1440,7 @@ async function runCode(questionId) {
     
     const langId = languageMap[langSelect.trim()];
     if (!langId) {
-        output.textContent = "⚠️ Language not supported";
+        output.textContent = " Language not supported";
         return;
     }
 
@@ -1343,13 +1451,14 @@ async function runCode(questionId) {
     console.log("=== END DEBUG ===");
 
     try {
-        output.textContent = "⏳ Executing code via Judge0 API...";
+        output.textContent = " Executing code via Judge0 API...";
         
         const res = await fetch("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "x-rapidapi-key": "fa9b51c4c7mshb146cfecdaae923p1ea58djsn1d308e6087c3",
+			//	b850fdfd93mshcb6e3c26fd014a4p18fe1bjsn6a2ab88488a3
+				"x-rapidapi-key": "c7a5cd7242mshf88bb5a60e54d82p1c6d5djsnef912edb0ba3",
                 "x-rapidapi-host": "judge0-ce.p.rapidapi.com"
             },
             body: JSON.stringify({
@@ -1379,7 +1488,7 @@ async function runCode(questionId) {
             // Enhanced output extraction - extract only the result
             const extractedOutput = extractResultFromOutput(actualOutput, cleanExpectedOutput);
             
-            output.textContent = "🧩 Code executed successfully.\n\nOutput:\n" + actualOutput;
+            output.textContent = " Code executed successfully.\n\nOutput:\n" + actualOutput;
 
             // Test against expected output
             testResult.style.display = 'block';
@@ -1402,29 +1511,30 @@ async function runCode(questionId) {
             let testResults = [];
             
             if (normalizedExpected === normalizedActual) {
-                testResults.push(`✅ Test Case: PASSED`);
-                testResults.push(`   Expected: ${cleanExpectedOutput}`);
-                testResults.push(`   Got: ${extractedOutput}`);
+                testResults.push(` Test Case: PASSED`);
+                testResults.push(`   Expected: \${cleanExpectedOutput}`);
+                testResults.push(`   Got: \${extractedOutput}`);
                 
                 testOutput.style.color = "#90EE90";
                 testResult.style.backgroundColor = "#1a472a";
                 testResult.style.borderLeft = "4px solid #00ff00";
                 output.textContent = "🧩 Code executed successfully.\n\nOutput:\n" + actualOutput + "\n\n✅ ALL TESTS PASSED";
                 
-                console.log("🎯 TEST PASSED - Question:", questionId, "Level:", questionId.split('-')[0]);
+                console.log(" TEST PASSED - Question:", questionId, "Level:", questionId.split('-')[0]);
                 
                 // Store PASSED status for marks calculation
                 saveCodingAnswer(questionId);
             } else {
                 testResults.push(`❌ Test Case: FAILED`);
-                testResults.push(`   Expected: ${cleanExpectedOutput}`);
-                testResults.push(`   Got: ${extractedOutput}`);
-                testResults.push(`   Full Output: ${actualOutput}`);
+                testResults.push(`   Expected: \${cleanExpectedOutput}`);
+                testResults.push(`   Got: \${extractedOutput}`);
+                //testResults.push(`   Full Output: \${actualOutput}`);
+				
                 
                 testOutput.style.color = "#FF6B6B";
                 testResult.style.backgroundColor = "#5c1e1e";
                 testResult.style.borderLeft = "4px solid #ff0000";
-                output.textContent = "🧩 Code executed successfully.\n\nOutput:\n" + actualOutput + "\n\n❌ TEST FAILED";
+                output.textContent = " Code executed successfully.\n\nOutput:\n" + actualOutput + "\n\n❌ TEST FAILED";
             }
 
             testOutput.textContent = testResults.join('\n');
@@ -1433,13 +1543,13 @@ async function runCode(questionId) {
         } else if (result.stderr) {
             output.textContent = "❌ Runtime Error:\n" + result.stderr;
         } else {
-            output.textContent = "⚠️ No output received. Check your code or input.";
+            output.textContent = " No output received. Check your code or input.";
         }
 
         saveCodingAnswer(questionId);
     } catch (e) {
         console.error("Error executing code:", e);
-        output.textContent = "🚫 Error:\n" + e.message;
+        output.textContent = " Error:\n" + e.message;
     }
 }
 
@@ -1530,7 +1640,7 @@ function normalizeOutput(text) {
         .toLowerCase();
 }
 
-function completeExam(codingMarks = 0) {
+/*function completeExam(codingMarks = 0) {
     sessionStorage.removeItem('examTimer_' + lang + '_' + email);
     sessionStorage.removeItem('codingSubmitted_' + lang + '_' + email);
     mcqQuestions.forEach(q => {
@@ -1553,7 +1663,45 @@ function completeExam(codingMarks = 0) {
 	window.location.href = '<%=request.getContextPath()%>/student/result?email=' + email +
                            '&languageName=' + lang +
                            '&totalMarks=' + totalQuestions +
+                           '&questionSet=' + setName +
                            '&codingMarks=' + codingMarks;
+}*/
+
+function completeExam(codingMarks = 0) {
+
+    const email = document.getElementById("email").value;
+    const setName = document.getElementById("setName").value;
+
+    sessionStorage.removeItem('examTimer_' + lang + '_' + email);
+    sessionStorage.removeItem('codingSubmitted_' + lang + '_' + email);
+
+    mcqQuestions.forEach(q => {
+
+        let qid = q.id.split('-')[1];
+
+        sessionStorage.removeItem('mcq-' + qid + '_' + lang + '_' + email);
+        sessionStorage.removeItem('viewed-' + qid + '_' + lang + '_' + email);
+
+    });
+
+    sessionStorage.removeItem('codingAnswers_' + lang + '_' + email);
+
+    const totalQuestions = mcqQuestions.length || 0;
+
+    console.log("=== EXAM COMPLETION ===");
+
+    console.log("Email:", email);
+    console.log("Question Set:", setName);
+    console.log("Coding Marks:", codingMarks);
+
+    console.log("=== END EXAM COMPLETION ===");
+
+    window.location.href =
+    '<%=request.getContextPath()%>/student/result?email='
+    + encodeURIComponent(email)
+    + '&languageName=' + encodeURIComponent(lang)
+    + '&questionSet=' + encodeURIComponent(setName)
+    + '&codingMarks=' + codingMarks;
 }
 
 // Debug function to check coding answers

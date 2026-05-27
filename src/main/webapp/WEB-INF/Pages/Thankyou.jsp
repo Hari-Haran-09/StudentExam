@@ -51,15 +51,45 @@
 		  <img src="${pageContext.request.contextPath}/images/logo.png" alt="Logo" width="200" height="70">
 		</div>
     <div class = "thanku">
-        <div style="width="200" height="70"">
+        <div style="width=200; height=70">
             <img class = "image" src = "${pageContext.request.contextPath}/images/Vector.png" alt = "thumbs">
         </div>
         <h1 class = "thank">Thank You For Your Participation</h1>
         <!-- <div class = "back-btn"> -->
-        <button class = "back">Back to Home</button>
+			<button type="button" onclick="quitExam()" 
+
+			        style="border: 2px solid gray; padding: 5px 10px; background-color: green;color:white">
+
+			    Quit Exam
+			</button>
+			 
+
     <!-- </div> -->
     </div>
    
     </form>
 </body>
+	 
+	 
+	 
+<script>
+    function quitExam() {
+        if (confirm("Are you sure want to quit the exam? This cannot be undone.")) {
+            fetch("${pageContext.request.contextPath}/student/quit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(() => {
+                window.location.href = "${pageContext.request.contextPath}/student/quit";
+            })
+            .catch(() => {
+                window.location.href = "${pageContext.request.contextPath}/student/quit";
+            });
+        }
+    }
+</script>
+ 
+
 </html>

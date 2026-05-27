@@ -12,6 +12,11 @@ import jakarta.persistence.Table;
 public class ReactMcq {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//    private String languageName;
+//    private String question;
+//    private String optionText;
+//    private String correctOption;
     private Long id;
     private String languageName;
     @Column(columnDefinition = "LONGTEXT")

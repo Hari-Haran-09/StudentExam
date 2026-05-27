@@ -127,26 +127,99 @@ body {
     align-items: center;
     margin-bottom: 10px;
 }
+.upload-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 2px dashed #007bff;
+    width: 75%;
+}
+.upload-btn {
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+}
+.upload-btn:hover {
+    background: #0056b3;
+}
+.status-message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+}
+.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 </style>
 </head>
 <body>
 <div style="width: 90%; margin: 0 auto; padding: 20px;">
-
+ 
     <div class="add-header">
         <div class="h1" style="font-weight: 600; font-size: 27px;">Add Coding Questions</div>
     </div>
 
-    <form id="questionForm" action="${pageContext.request.contextPath}/student/saveQuestions" method="post">
+     Excel Upload Section 
+    <div class="upload-section">
+        <p style="font-weight: 600; font-size: 16px; margin-bottom: 10px;">Excel Upload</p>
+        <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+            Upload an Excel file to automatically fill questions and test cases
+        </p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <select id="excelLanguage" class="select">
+                <option value="" disabled selected>Select Language</option>
+            </select>
+            <input type="file" id="excelFile" accept=".xlsx,.xls" style="padding: 8px;">
+			<button type="button" id="uploadBtn" onclick="uploadExcel()">
+			  📤 Upload & Auto Fill
+			</button>
 
+        </div>
+        <div id="uploadStatus" class="status-message"></div>
+    </div>
+ 
+    <form id="questionForm" action="${pageContext.request.contextPath}/student/saveQuestions" method="post">
+ 
         <div class="dropdown">
             <select id="languageName" name="languageName" required class="select">
                 <option value="" disabled selected>Select Coding Language</option>
             </select>
         </div>
-
+ 
         <div class="text">
             
-            <!-- Easy Level Section -->
+             Easy Level Section 
             <div class="question-section">
                 <div class="test-case-header">
                     <h3 class="level-title">Easy Level</h3>
@@ -159,11 +232,11 @@ body {
                 </div>
                 
                 <div id="easyTestCases">
-                    <!-- Test cases will be added dynamically -->
+                     Test cases will be added dynamically 
                 </div>
             </div>
-
-            <!-- Medium Level Section -->
+ 
+             Medium Level Section 
             <div class="question-section">
                 <div class="test-case-header">
                     <h3 class="level-title">Medium Level</h3>
@@ -176,11 +249,11 @@ body {
                 </div>
                 
                 <div id="mediumTestCases">
-                    <!-- Test cases will be added dynamically -->
+                     Test cases will be added dynamically 
                 </div>
             </div>
-
-            <!-- Hard Level Section -->
+ 
+             Hard Level Section 
             <div class="question-section">
                 <div class="test-case-header">
                     <h3 class="level-title">Hard Level</h3>
@@ -193,44 +266,277 @@ body {
                 </div>
                 
                 <div id="hardTestCases">
-                    <!-- Test cases will be added dynamically -->
+                     Test cases will be added dynamically 
                 </div>
             </div>
-
+ 
         </div>
-
+ 
         <div class="button1">
             <button type="submit" class="save-btn">Save Questions</button>
         </div>
-
+ 
     </form>
-
+ 
 </div>
-
+ 
 <script>
+// Global variables
+let currentUploading = false;
+let excelFillDone = false;
+let isFilling = false;
+
+
 // Fetch Language Name
 fetch("<%=request.getContextPath()%>/student/getLanguage")
     .then(res => res.json())
     .then(data => {
         const languageSelect = document.getElementById("languageName");
+        const excelLanguageSelect = document.getElementById("excelLanguage");
  
         data.forEach(item => {
+            // Main dropdown
             const opt = document.createElement("option");
             opt.value = item.languageName;
             opt.textContent = item.languageName;
             languageSelect.appendChild(opt);
+            
+            // Excel dropdown
+            const opt2 = document.createElement("option");
+            opt2.value = item.languageName;
+            opt2.textContent = item.languageName;
+            excelLanguageSelect.appendChild(opt2);
         });
     })
     .catch(err => console.error("Error fetching languages:", err));
 
-// Test Case Management
-function addEasyTestCase() {
+// ==========================================
+// EXCEL UPLOAD FUNCTION
+// ==========================================
+function uploadExcel() {
+	if (event) event.preventDefault();
+    if (currentUploading) return;
+    
+    const fileInput = document.getElementById("excelFile");
+    const languageSelect = document.getElementById("excelLanguage");
+    const file = fileInput.files[0];
+    const language = languageSelect.value;
+    const uploadBtn = document.getElementById("uploadBtn");
+    
+    console.log("=== UPLOAD STARTED ===");
+    console.log("File:", file ? file.name : "No file");
+    console.log("Language:", language);
+    
+    // Validation
+    if (!language) {
+        showStatus("Please select a language first.", "error");
+        return;
+    }
+    
+    if (!file) {
+        showStatus("Please select an Excel file.", "error");
+        return;
+    }
+    
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        showStatus("File size should be less than 10MB.", "error");
+        return;
+    }
+    
+    // Validate file extension
+    const validExtensions = ['.xlsx', '.xls'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExtensions.includes(fileExtension)) {
+        showStatus("Please select a valid Excel file (.xlsx or .xls).", "error");
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("language", language);
+    
+    // Show loading
+    currentUploading = true;
+    uploadBtn.innerHTML = '<span class="loading"></span> Uploading...';
+    uploadBtn.disabled = true;
+    
+    showStatus("Uploading Excel file...", "success");
+    
+    fetch("<%=request.getContextPath()%>/student/uploadExcel", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        console.log("Response status:", res.status);
+        
+        if (!res.ok) {
+            return res.text().then(text => {
+                console.error("Error response:", text);
+                throw new Error(`Server error ${res.status}: ${text || res.statusText}`);
+            });
+        }
+        
+        return res.json();
+    })
+    .then(data => {
+        console.log("=== RESPONSE DATA ===");
+        console.log("Full response:", JSON.stringify(data, null, 2));
+        
+        if (data.success === true) {
+            showStatus(data.message || "Excel uploaded successfully!", "success");
+            
+            // Fill the form
+            if (data.data) {
+                console.log("Calling fillFromExcel...");
+                fillFromExcel(data.data);
+            } else {
+                console.error("No data.data in response!");
+            }
+            
+            // Clear file input
+            fileInput.value = '';
+        } else {
+            throw new Error(data.message || "Failed to process Excel file");
+        }
+    })
+    .catch(err => {
+        console.error('Upload error:', err);
+        showStatus("Upload failed: " + err.message, "error");
+    })
+    .finally(() => {
+        currentUploading = false;
+        uploadBtn.innerHTML = '📤 Upload & Auto Fill';
+        uploadBtn.disabled = false;
+    });
+}
+
+// ==========================================
+// FILL FROM EXCEL
+// ==========================================
+function fillFromExcel(data) {
+	// Prevent multiple simultaneous calls
+	  if (isFilling) {
+	      console.warn("Already filling form, skipping duplicate call");
+	      return;
+	  }
+	  
+	  isFilling = true;
+	  console.log("\n=== FILL FROM EXCEL STARTED ===");
+	  console.log("Data structure:", Object.keys(data));
+	  
+ 
+	
+    // Set language in both dropdowns
+    if (data.language) {
+        document.getElementById("languageName").value = data.language;
+        document.getElementById("excelLanguage").value = data.language;
+        console.log("✓ Set language to:", data.language);
+    }
+    
+    // Clear existing test cases
+    document.getElementById('easyTestCases').innerHTML = '';
+    document.getElementById('mediumTestCases').innerHTML = '';
+    document.getElementById('hardTestCases').innerHTML = '';
+    console.log("✓ Cleared all test cases");
+    
+    // Process each level
+    const levels = ['easy', 'medium', 'hard'];
+    levels.forEach(level => {
+        console.log(`\n--- Processing ${level.toUpperCase()} ---`);
+        
+        const levelData = data[level];
+        if (!levelData) {
+            console.warn(`No data for ${level}`);
+            if (level === 'easy') addEasyTestCase();
+            if (level === 'medium') addMediumTestCase();
+            if (level === 'hard') addHardTestCase();
+            return;
+        }
+        
+        console.log(`${level} data:`, levelData);
+        
+		const questionFieldName = level + "Question";
+		const questionField = document.querySelector('textarea[name="' + questionFieldName + '"]');
+        console.log(`Looking for textarea[name="${level}Question"]`);
+        console.log("Found question field:", !!questionField);
+        console.log("Question text:", levelData.question);
+        
+        if (questionField) {
+            if (levelData.question) {
+                questionField.value = levelData.question;
+                // Force textarea to resize
+                setTimeout(() => {
+                    questionField.style.height = 'auto';
+                    questionField.style.height = (questionField.scrollHeight) + 'px';
+                }, 10);
+                console.log(`✓ Set ${level} question: "${levelData.question.substring(0, 50)}..."`);
+            } else {
+                console.warn(`⚠ Question is empty for ${level}`);
+                questionField.value = "";
+            }
+        } else {
+            console.error(`✗ Question field NOT FOUND for ${level}!`);
+        }
+        
+        // Add test cases
+        const testCases = levelData.testCases;
+        if (testCases && Array.isArray(testCases) && testCases.length > 0) {
+            console.log(`Found ${testCases.length} test cases for ${level}`);
+            
+            testCases.forEach((tc, index) => {
+                const input = tc.input || "";
+                const output = tc.output || "";
+                
+                console.log(`  Test case ${index + 1}: input="${input}", output="${output}"`);
+                
+                // Add test case with data
+                if (level === 'easy') addEasyTestCase(input, output);
+                if (level === 'medium') addMediumTestCase(input, output);
+                if (level === 'hard') addHardTestCase(input, output);
+            });
+        } else {
+            console.warn(`No test cases for ${level}, adding empty one`);
+            if (level === 'easy') addEasyTestCase();
+            if (level === 'medium') addMediumTestCase();
+            if (level === 'hard') addHardTestCase();
+        }
+    });
+    
+    console.log("\n=== FILL COMPLETED ===");
+    
+    // Verify all questions were set
+    console.log("\n=== VERIFICATION ===");
+    const easyQ = document.querySelector('textarea[name="easyQuestion"]');
+    const mediumQ = document.querySelector('textarea[name="mediumQuestion"]');
+    const hardQ = document.querySelector('textarea[name="hardQuestion"]');
+    
+    console.log("Easy question length:", easyQ ? easyQ.value.length : "NOT FOUND");
+    console.log("Medium question length:", mediumQ ? mediumQ.value.length : "NOT FOUND");
+    console.log("Hard question length:", hardQ ? hardQ.value.length : "NOT FOUND");
+    
+    if (easyQ && easyQ.value) console.log("Easy Q preview:", easyQ.value.substring(0, 50));
+    if (mediumQ && mediumQ.value) console.log("Medium Q preview:", mediumQ.value.substring(0, 50));
+    if (hardQ && hardQ.value) console.log("Hard Q preview:", hardQ.value.substring(0, 50));
+    
+    showStatus("Form filled successfully from Excel!", "success");
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+	
+	isFilling = false;
+
+}
+
+// ==========================================
+// TEST CASE MANAGEMENT (UPDATED)
+// ==========================================
+function addEasyTestCase(inputValue = "", outputValue = "") {
     const testCasesDiv = document.getElementById('easyTestCases');
+    const testCaseNum = testCasesDiv.children.length + 1;
     const newTestCase = document.createElement('div');
     newTestCase.className = 'test-case-section';
     newTestCase.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <p class="sub-ques" style="margin: 0;">Test Case ${testCasesDiv.children.length + 1}</p>
+            <p class="sub-ques" style="margin: 0;">Test Case ${testCaseNum}</p>
             <button type="button" class="remove-test-case-btn" onclick="this.parentElement.parentElement.remove(); renumberTestCases('easyTestCases')">Remove</button>
         </div>
         <div class="text1">
@@ -243,15 +549,29 @@ function addEasyTestCase() {
         </div>
     `;
     testCasesDiv.appendChild(newTestCase);
+    
+    // Set values if provided
+    const textareas = newTestCase.querySelectorAll('textarea');
+    if (inputValue) {
+        textareas[0].value = inputValue;
+        textareas[0].style.height = 'auto';
+        textareas[0].style.height = (textareas[0].scrollHeight) + 'px';
+    }
+    if (outputValue) {
+        textareas[1].value = outputValue;
+        textareas[1].style.height = 'auto';
+        textareas[1].style.height = (textareas[1].scrollHeight) + 'px';
+    }
 }
-
-function addMediumTestCase() {
+ 
+function addMediumTestCase(inputValue = "", outputValue = "") {
     const testCasesDiv = document.getElementById('mediumTestCases');
+    const testCaseNum = testCasesDiv.children.length + 1;
     const newTestCase = document.createElement('div');
     newTestCase.className = 'test-case-section';
     newTestCase.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <p class="sub-ques" style="margin: 0;">Test Case ${testCasesDiv.children.length + 1}</p>
+            <p class="sub-ques" style="margin: 0;">Test Case ${testCaseNum}</p>
             <button type="button" class="remove-test-case-btn" onclick="this.parentElement.parentElement.remove(); renumberTestCases('mediumTestCases')">Remove</button>
         </div>
         <div class="text1">
@@ -264,15 +584,28 @@ function addMediumTestCase() {
         </div>
     `;
     testCasesDiv.appendChild(newTestCase);
+    
+    const textareas = newTestCase.querySelectorAll('textarea');
+    if (inputValue) {
+        textareas[0].value = inputValue;
+        textareas[0].style.height = 'auto';
+        textareas[0].style.height = (textareas[0].scrollHeight) + 'px';
+    }
+    if (outputValue) {
+        textareas[1].value = outputValue;
+        textareas[1].style.height = 'auto';
+        textareas[1].style.height = (textareas[1].scrollHeight) + 'px';
+    }
 }
-
-function addHardTestCase() {
+ 
+function addHardTestCase(inputValue = "", outputValue = "") {
     const testCasesDiv = document.getElementById('hardTestCases');
+    const testCaseNum = testCasesDiv.children.length + 1;
     const newTestCase = document.createElement('div');
     newTestCase.className = 'test-case-section';
     newTestCase.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <p class="sub-ques" style="margin: 0;">Test Case ${testCasesDiv.children.length + 1}</p>
+            <p class="sub-ques" style="margin: 0;">Test Case ${testCaseNum}</p>
             <button type="button" class="remove-test-case-btn" onclick="this.parentElement.parentElement.remove(); renumberTestCases('hardTestCases')">Remove</button>
         </div>
         <div class="text1">
@@ -285,8 +618,32 @@ function addHardTestCase() {
         </div>
     `;
     testCasesDiv.appendChild(newTestCase);
+    
+    const textareas = newTestCase.querySelectorAll('textarea');
+    if (inputValue) {
+        textareas[0].value = inputValue;
+        textareas[0].style.height = 'auto';
+        textareas[0].style.height = (textareas[0].scrollHeight) + 'px';
+    }
+    if (outputValue) {
+        textareas[1].value = outputValue;
+        textareas[1].style.height = 'auto';
+        textareas[1].style.height = (textareas[1].scrollHeight) + 'px';
+    }
 }
 
+function showStatus(message, type) {
+    const statusDiv = document.getElementById("uploadStatus");
+    if (statusDiv) {
+        statusDiv.textContent = message;
+        statusDiv.className = "status-message " + type;
+        
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
+}
+ 
 function renumberTestCases(containerId) {
     const container = document.getElementById(containerId);
     const testCases = container.getElementsByClassName('test-case-section');
@@ -297,14 +654,10 @@ function renumberTestCases(containerId) {
         }
     });
 }
-
+ 
 // Initialize with one test case for each level
-document.addEventListener('DOMContentLoaded', function() {
-    addEasyTestCase();
-    addMediumTestCase();
-    addHardTestCase();
-});
 
+ 
 // Form submission
 document.getElementById("questionForm").addEventListener("submit", function (e) {
     const language = document.getElementById("languageName").value;
@@ -380,14 +733,19 @@ document.getElementById("questionForm").addEventListener("submit", function (e) 
         e.preventDefault();
     }
 });
-
+ 
 // Auto-resize textareas
-document.querySelectorAll('textarea').forEach(textarea => {
-    textarea.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
-    });
+document.addEventListener('input', function(e) {
+    if (e.target.tagName === 'TEXTAREA') {
+        e.target.style.height = 'auto';
+        e.target.style.height = (e.target.scrollHeight) + 'px';
+    }
 });
+
+// Diagnostic function - run this in console to check question values
+
+
+console.log("Diagnostic function loaded. Run checkQuestions() in console to verify question values.");
 </script>
 </body>
 </html>

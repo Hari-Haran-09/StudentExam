@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin Menu</title>
+<title>Student Menu</title>
 
 <style>
   .menu {
@@ -99,6 +99,12 @@
         Update Questions
       </button>
     </li>
+	
+	<li>
+	      <button onclick="window.location.href='${pageContext.request.contextPath}/student/getCodingAnswers'">
+	        Coding Answers
+	      </button>
+	    </li>
 
     <li>
       <button onclick="toggleSettings()">Settings</button>
@@ -119,8 +125,8 @@
           Add Language
         </button>
 		<button onclick="window.location.href='${pageContext.request.contextPath}/student/getexperience'">
-		          Experience
-		        </button>
+				         Add Experience
+				        </button>
       </div>
     </li>
 

@@ -8,4 +8,6 @@ import com.exam.entity.Mcq;
 
 public interface McqRepository extends JpaRepository<Mcq, Long> {
 	List<Mcq> findByLanguageName(String languageName);
+	
+	int countByLanguageName(String languageName);
 }

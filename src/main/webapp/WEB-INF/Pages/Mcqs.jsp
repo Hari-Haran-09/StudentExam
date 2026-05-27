@@ -119,9 +119,9 @@
         <div class="s1">
           <p class="op">Options</p>
         </div>
-<!--        <div class="s2">
+        <div class="s2">
           <button type="button" class="add-q" id="add-option-btn">+Add Option</button>
-        </div>-->
+        </div>
       </div>
 
       <div class="option-container" id="options-container">
@@ -148,7 +148,7 @@
     </form>
   </div>
 
-  <script>
+  <!--<script>
     document.addEventListener('DOMContentLoaded', () => {
       const addOptionBtn = document.getElementById('add-option-btn');
       const optionsContainer = document.getElementById('options-container');
@@ -174,7 +174,7 @@
         const optionCount = optionsContainer.getElementsByTagName('input').length;
         correctOptionSelect.innerHTML = '<option value="" disabled selected>Select Correct Option</option>';
         for (let i = 0; i < optionCount; i++) {
-          const label = String.fromCharCode(97 + i);
+          const label = String.fromCharCode(97 + i); // a, b, c...
           const option = document.createElement('option');
           option.value = label;
           option.textContent = label;
@@ -185,10 +185,14 @@
       // Initialize dropdown
       updateCorrectOptions();
 
-      // Add new option
+      // Add new option (max 6)
       addOptionBtn.addEventListener('click', () => {
         const currentCount = optionsContainer.getElementsByTagName('input').length;
-        
+        if (currentCount >= 6) {
+          alert("Maximum 6 options allowed");
+          return;
+        }
+
         const newInput = document.createElement('input');
         newInput.type = 'text';
         newInput.name = 'optionText';
@@ -200,52 +204,196 @@
         updateCorrectOptions();
       });
 
-      // Handle form submission
+      // Handle form submission - FIXED: Send options as JSON to avoid comma issues
       form.addEventListener('submit', (e) => {
-        // Prevent multiple hidden inputs
-        const existingHiddenInput = form.querySelector('input[name="optionText"][type="hidden"]');
-        if (existingHiddenInput) {
-          existingHiddenInput.remove();
-        }
+        // Remove any old hidden field
+        const oldJson = form.querySelector('input[name="optionsJson"]');
+        if (oldJson) oldJson.remove();
 
-        // Remove name attributes from individual option inputs
         const optionInputs = document.querySelectorAll('input[name="optionText"].option-box');
-        optionInputs.forEach(input => input.removeAttribute('name'));
 
-        // Collect and format options
-        const options = Array.from(optionInputs)
-          .map((input, index) => {
-            const value = input.value.trim();
-            if (value) {
-              const label = String.fromCharCode(97 + index) + '.';
-              return `${label} ${value}`;
-            }
-            return null;
-          })
-          .filter(option => option !== null);
+        // Collect only non-empty option texts
+        const optionValues = Array.from(optionInputs)
+          .map(input => input.value.trim())
+          .filter(val => val !== "");
 
-        
-
-        const optionText = options.join(', ');
-        console.log("Submitting optionText: " + optionText);
-
-        // Create hidden input for formatted optionText
+        // Create hidden field with JSON array - This solves comma problem completely
         const hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
-        hiddenInput.name = 'optionText';
-        hiddenInput.value = optionText;
+        hiddenInput.name = 'optionsJson';           // NEW FIELD NAME
+        hiddenInput.value = JSON.stringify(optionValues);
         form.appendChild(hiddenInput);
 
-        // Confirm submission
+        // Optional: Show what is being sent
+        console.log("Sending options as JSON:", hiddenInput.value);
+
         const confirmation = confirm("Do you want to post the data?");
         if (!confirmation) {
           e.preventDefault();
         }
-
-        // Restore name attributes
-        optionInputs.forEach(input => input.name = 'optionText');
       });
     });
-  </script>
+  </script>-->
+  
+  <script>
+    	    document.addEventListener('DOMContentLoaded', () => {
+    	      const addOptionBtn = document.getElementById('add-option-btn');
+    	      const optionsContainer = document.getElementById('options-container');
+    	      const correctOptionSelect = document.getElementById('correctOption');
+    	      const form = document.getElementById('mcqform');
+    	      const languageSelect = document.getElementById("languageName");
+    	      const saveBtn = document.querySelector('.save-btn');
+   
+    	      // Fetch languages
+    	      fetch("<%=request.getContextPath()%>/student/getLanguage")
+    	        .then(res => res.json())
+    	        .then(data => {
+    	          data.forEach(item => {
+    	            const opt = document.createElement("option");
+    	            opt.value = item.languageName;
+    	            opt.textContent = item.languageName;
+    	            languageSelect.appendChild(opt);
+    	          });
+    	        })
+    	        .catch(err => console.error("Error fetching languages:", err));
+   
+    	      // Function to disable/enable form fields
+    	      function toggleFormFields(disable) {
+    	        const questionBox = document.querySelector('.question-box');
+    	        const optionInputs = document.querySelectorAll('.option-box');
+    	        
+    	        questionBox.disabled = disable;
+    	        optionInputs.forEach(input => input.disabled = disable);
+    	        addOptionBtn.disabled = disable;
+    	        correctOptionSelect.disabled = disable;
+    	        saveBtn.disabled = disable;
+    	        
+    	        // Visual feedback
+    	        if (disable) {
+    	          saveBtn.style.background = '#cccccc';
+    	          saveBtn.style.cursor = 'not-allowed';
+    	        } else {
+    	          saveBtn.style.background = '#28a745';
+    	          saveBtn.style.cursor = 'pointer';
+    	        }
+    	      }
+   
+    	      // Check MCQ limit when language is selected
+    	      languageSelect.addEventListener('change', () => {
+    	        const selectedLanguage = languageSelect.value;
+    	        
+    	        if (!selectedLanguage) {
+    	          toggleFormFields(true);
+    	          return;
+    	        }
+   
+    	        console.log("Selected language:", selectedLanguage); // Debug log
+   
+    	        // Call the checkMcqLimit endpoint
+    	        fetch("<%=request.getContextPath()%>/student/checkMcqLimit?languageName=" + encodeURIComponent(selectedLanguage))
+    	          .then(res => {
+    	            if (!res.ok) {
+    	              throw new Error(`HTTP error! status: ${res.status}`);
+    	            }
+    	            return res.json();
+    	          })
+    	          .then(data => {
+    	            console.log("Response data:", data); // Debug log
+    	            
+    	            if (data.error) {
+    	              alert(`Error: ${data.error}`);
+    	              toggleFormFields(true);
+    	              return;
+    	            }
+   
+    	            if (data.limitReached) {
+    	              alert(`MCQ Limit Reached! You cannot add more MCQs.`);
+    	              toggleFormFields(true);
+    	            } else {
+    	              // Enable form if limit not reached
+    	              toggleFormFields(false);
+    	              console.log(`MCQs available for ${data.languageName || selectedLanguage}: ${data.currentCount}/${data.totalAllowed}`);
+    	            }
+    	          })
+    	          .catch(err => {
+    	            console.error("Error checking MCQ limit:", err);
+    	            alert("Failed to check MCQ limit. Please try again.");
+    	            toggleFormFields(true);
+    	          });
+    	      });
+   
+    	      // Update correctOption dropdown based on number of options
+    	      function updateCorrectOptions() {
+    	        const optionCount = optionsContainer.getElementsByTagName('input').length;
+    	        correctOptionSelect.innerHTML = '<option value="" disabled selected>Select Correct Option</option>';
+    	        for (let i = 0; i < optionCount; i++) {
+    	          const label = String.fromCharCode(97 + i); // a, b, c...
+    	          const option = document.createElement('option');
+    	          option.value = label;
+    	          option.textContent = label;
+    	          correctOptionSelect.appendChild(option);
+    	        }
+    	      }
+   
+    	      // Initialize dropdown and disable form initially
+    	      updateCorrectOptions();
+    	      toggleFormFields(true); // Disable until language is selected
+   
+    	      // Add new option (max 6)
+    	      addOptionBtn.addEventListener('click', () => {
+    	        const currentCount = optionsContainer.getElementsByTagName('input').length;
+    	        if (currentCount >= 6) {
+    	          alert("Maximum 6 options allowed");
+    	          return;
+    	        }
+   
+    	        const newInput = document.createElement('input');
+    	        newInput.type = 'text';
+    	        newInput.name = 'optionText';
+    	        newInput.placeholder = 'Enter Your Option';
+    	        newInput.classList.add('option-box');
+    	        newInput.required = true;
+    	        newInput.setAttribute('data-label', String.fromCharCode(97 + currentCount) + '.');
+    	        optionsContainer.appendChild(newInput);
+    	        updateCorrectOptions();
+    	      });
+   
+    	      // Handle form submission
+    	      form.addEventListener('submit', (e) => {
+    	        // Check if form is disabled (limit reached)
+    	        if (saveBtn.disabled) {
+    	          e.preventDefault();
+    	          alert("Cannot submit! MCQ limit has been reached for this language.");
+    	          return;
+    	        }
+   
+    	        // Remove any old hidden field
+    	        const oldJson = form.querySelector('input[name="optionsJson"]');
+    	        if (oldJson) oldJson.remove();
+   
+    	        const optionInputs = document.querySelectorAll('input[name="optionText"].option-box');
+   
+    	        // Collect only non-empty option texts
+    	        const optionValues = Array.from(optionInputs)
+    	          .map(input => input.value.trim())
+    	          .filter(val => val !== "");
+   
+    	        // Create hidden field with JSON array
+    	        const hiddenInput = document.createElement('input');
+    	        hiddenInput.type = 'hidden';
+    	        hiddenInput.name = 'optionsJson';
+    	        hiddenInput.value = JSON.stringify(optionValues);
+    	        form.appendChild(hiddenInput);
+   
+    	        console.log("Sending options as JSON:", hiddenInput.value);
+   
+    	        const confirmation = confirm("Do you want to post the data?");
+    	        if (!confirmation) {
+    	          e.preventDefault();
+    	        }
+    	      });
+    	    });
+    	  </script>
+  
 </body>
 </html>

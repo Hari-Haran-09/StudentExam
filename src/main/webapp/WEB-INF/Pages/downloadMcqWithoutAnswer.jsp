@@ -131,7 +131,8 @@ document.addEventListener("DOMContentLoaded", function() {
             questionDiv.style.marginBottom = "25px";
 
             let optionsHtml = '';
-            const options = item.optionText.split(', ');
+            //const options = item.optionText.split(', ');
+			const options = item.optionText.split(/,\s*(?=[a-z]\.)/);
             options.forEach(opt => {
                 const trimmedOpt = opt.trim();
 				const escapedOpt = escapeHTML(trimmedOpt);

@@ -1,64 +1,52 @@
-<!--<%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Exam Result</title>
-</head>
-<body>
-<h2>${languageName} Exam Result</h2>
-<p>Total Marks: ${marks}</p>
-<a href="${pageContext.request.contextPath}/student/examScreen/mcq?languageName=${languageName}">Take Exam Again</a>
-</body>
-</html>
 
-
-
--->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!-- MCQ Marks -->
-<c:set var="mcqMarksRaw" value="${not empty marks ? marks : (not empty param.marks ? param.marks : 0)}" />
-<c:set var="mcqMarks" value="${mcqMarksRaw + 0}" />
+<!-- ========================= -->
+<!-- MCQ MARKS -->
+<!-- ========================= -->
 
-<!-- Coding Marks -->
-<c:set var="codingMarksRaw" value="${not empty codingMarks ? codingMarks : (not empty param.codingMarks ? param.codingMarks : 0)}" />
-<c:set var="codingMarks" value="${codingMarksRaw + 0}" />
+<c:set var="mcqMarks"
+       value="${not empty marks ? marks : 0}" />
 
-<!-- Total Possible MCQ Marks (last index of MCQ) -->
-<c:choose>
-  <c:when test="${not empty mcq}">
-    <c:set var="totalPossibleMarks" value="${fn:length(mcq)}" />
-  </c:when>
-  <c:otherwise>
-    <c:set var="totalPossibleMarks" value="${not empty param.totalMarks ? param.totalMarks : 0}" />
-  </c:otherwise>
-</c:choose>
+<!-- ========================= -->
+<!-- CODING MARKS -->
+<!-- ========================= -->
 
-<!-- Total Possible Coding Marks (sum of easy=5, medium=10, hard=15) -->
-<c:set var="totalPossibleCodingMarks" value="${not empty totalCodingMarks ? totalCodingMarks : (not empty param.totalCodingMarks ? param.totalCodingMarks : 30)}" />
+<c:set var="codingMarks"
+       value="${not empty codingMarks ? codingMarks : 0}" />
 
-<!-- Calculate percentages for MCQ and Coding separately -->
-<c:set var="mcqPercentage" value="${totalPossibleMarks > 0 ? (mcqMarks * 100 / totalPossibleMarks) : 0}" />
-<c:set var="codingPercentage" value="${totalPossibleCodingMarks > 0 ? (codingMarks * 100 / totalPossibleCodingMarks) : 0}" />
+<!-- ========================= -->
+<!-- TOTAL MCQ QUESTIONS -->
+<!-- ========================= -->
 
-<!-- Calculate final score with 50% weight for MCQ and 50% for Coding -->
-<c:set var="scorePercentage" value="${(mcqPercentage * 0.5) + (codingPercentage * 0.5)}" />
+<c:set var="totalPossibleMarks"
+       value="${not empty totalPossibleMarks ? totalPossibleMarks : 0}" />
 
-<!-- Pass/Fail logic -->
-<c:choose>
-  <c:when test="${scorePercentage >= 50}">
-    <c:set var="status" value="Pass"/>
-  </c:when>
-  <c:otherwise>
-    <c:set var="status" value="Fail"/>
-  </c:otherwise>
-</c:choose>
+<!-- ========================= -->
+<!-- TOTAL CODING MARKS -->
+<!-- ========================= -->
 
+<c:set var="totalPossibleCodingMarks"
+       value="${not empty totalPossibleCodingMarks ? totalPossibleCodingMarks : 0}" />
+
+<!-- ========================= -->
+<!-- SCORE PERCENTAGE -->
+<!-- ========================= -->
+
+<c:set var="scorePercentage"
+       value="${not empty scorePercentage ? scorePercentage : 0}" />
+
+<!-- ========================= -->
+<!-- STATUS -->
+<!-- ========================= -->
+
+<c:set var="status"
+       value="${not empty status ? status : 'FAILED'}" />
+       
 <!DOCTYPE html>
 <html>
 <head>

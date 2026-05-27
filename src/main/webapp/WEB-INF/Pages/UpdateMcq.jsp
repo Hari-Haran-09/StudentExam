@@ -8,41 +8,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Update MCQs</title>
   <style>
-    body { font-family: "Roboto", sans-serif; }
-    .add-header { margin-left: 18%; }
-    .h1 { font-size: 22px; font-weight: bold; }
-    .ques { font-weight: bold; }
+    body { font-family: "Roboto", sans-serif }
+    .main-box { padding: 30px; max-width: 900px }
+    .add-header { margin-left: 0; margin-bottom: 20px; }
+    .h1 { font-size: 26px; font-weight: bold; color: #333; }
+    .ques, .op { font-weight: bold; color: #444; margin: 15px 0 8px; }
     .question-box {
-      width: 65%; height: 150px; box-shadow: 1px 1px 10px 0px #00000040;
-      border: none; border-radius: 5px; margin-top: 10px; padding: 15px;
+      width: 100%; height: 150px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border: none; border-radius: 8px; margin-top: 10px; padding: 15px;
       font-size: 16px; resize: none; outline: none; box-sizing: border-box;
     }
-    .side { display: flex; justify-content: space-between; align-items: center; width: 65%; }
-    .op { font-weight: bold; }
-    .add-q { background: #2176bb; color: #fff; border: none; padding: 7px 14px;
-      border-radius: 5px; font-size: 13px; font-weight: bold; cursor: pointer; }
-    .option-container { margin-top: 10px; width: 65%; }
-    .option-box {
-      width: 100%; padding: 15px; margin-bottom: 12px; box-shadow: 1px 1px 10px 0px #00000040;
-      border: none; border-radius: 5px; font-size: 14px; outline: none; box-sizing: border-box;
+    .side { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; }
+    .add-q {
+      background: #2176bb; color: #fff; border: none; padding: 8px 16px;
+      border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;
+      transition: background 0.3s;
     }
-    .save-btn { background: #28a745; color: white; font-weight: bold; border: none;
-      border-radius: 5px; cursor: pointer; width: fit-content; padding: 10px; }
-    .save { width: 65%; display: flex; justify-content: end; margin-top: 10px; }
-    .dropdown { width: 65%; display: flex; justify-content: end; margin-top: 10px; }
-    .select { padding: 7px; outline: none; width: 200px; }
-
-    /* Fix for preserving multiline question display */
-    .question-display {
-      white-space: pre-wrap;
-      font-size: 16px;
-      line-height: 1.5;
-      background-color: #f9f9f9;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 1px 1px 8px #00000030;
-      width: 65%;
-      margin-top: 10px;
+    .add-q:hover { background: #1a5d94; }
+    .option-container { margin-top: 10px; }
+    .option-box {
+      width: 100%; padding: 14px; margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: none; border-radius: 8px;
+      font-size: 15px; outline: none; box-sizing: border-box;
+    }
+    .save-btn {
+      background: #28a745; color: white; font-weight: bold; border: none;
+      border-radius: 8px; cursor: pointer; padding: 12px 30px; font-size: 16px;
+      transition: background 0.3s;
+    }
+    .save-btn:hover { background: #218838; }
+    .save { text-align: right; margin-top: 25px; }
+    .dropdown { text-align: right; margin: 15px 0; }
+    .select {
+      padding: 10px; outline: none; width: 250px; border-radius: 6px;
+      border: 1px solid #ccc; font-size: 15px;
     }
   </style>
 </head>
@@ -54,226 +53,196 @@
 
     <form id="mcqform" action="updateMcq" method="post">
       <input type="hidden" name="id" id="mcqId" />
+
+      <!-- Language Dropdown -->
       <div class="dropdown">
         <select id="languageName" name="languageName" required class="select">
           <option value="" disabled selected>Select Coding Language</option>
         </select>
       </div>
 
+      <!-- Question -->
       <div class="hh">
         <p class="ques">Question</p>
         <textarea class="question-box" name="question" placeholder="Enter Your Question" required id="questionTextarea"></textarea>
       </div>
 
+      <!-- Options Header -->
       <div class="side">
         <div><p class="op">Options</p></div>
-        <!--<div><button type="button" class="add-q" id="add-option-btn">+Add Option</button></div>-->
+        <div><button type="button" class="add-q" id="add-option-btn">+ Add Option</button></div>
       </div>
 
+      <!-- Dynamic Options -->
       <div class="option-container" id="options-container"></div>
 
+      <!-- Correct Option Dropdown -->
       <div class="dropdown">
         <select id="correctOption" name="correctOption" required class="select">
-          <option value="" disabled selected>Select Correct Option</option>
+          <option value="" disabled selected>Select Correct Option (a, b, c, d)</option>
         </select>
       </div>
 
+      <!-- Submit Button -->
       <div class="save">
-        <button type="submit" class="save-btn">Save Question</button>
+        <button type="submit" class="save-btn">Update Question</button>
       </div>
     </form>
   </div>
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const addOptionBtn = document.getElementById('add-option-btn');
     const optionsContainer = document.getElementById('options-container');
     const correctOptionSelect = document.getElementById('correctOption');
-    const form = document.getElementById('mcqform');
+    const languageSelect = document.getElementById('languageName');
     const questionTextarea = document.getElementById('questionTextarea');
+    const addOptionBtn = document.getElementById('add-option-btn');
+    const form = document.getElementById('mcqform');
 
-    // Fetch available languages
+    // Step 1: Load languages from server
     fetch("<%=request.getContextPath()%>/student/getLanguage")
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load languages");
+        return res.json();
+      })
       .then(data => {
-        const languageSelect = document.getElementById("languageName");
+        // Populate language dropdown
         data.forEach(item => {
           const opt = document.createElement("option");
           opt.value = item.languageName;
           opt.textContent = item.languageName;
           languageSelect.appendChild(opt);
         });
+
+        // Step 2: NOW safe to auto-fill edit data (options exist!)
+        const storedData = sessionStorage.getItem("mcqToEdit");
+        if (storedData) {
+          try {
+            const mcq = JSON.parse(storedData);
+
+            // Helper to decode if needed
+            const decodeText = (text, isEncoded) => {
+              if (!isEncoded) return text.replace(/&quot;/g, '"');
+              try { return decodeURIComponent(escape(atob(text))); }
+              catch (e) { return text; }
+            };
+
+            const isEncoded = mcq.encoded || false;
+            const decodedQuestion = decodeText(mcq.question, isEncoded);
+            const decodedOptionText = decodeText(mcq.optionText, isEncoded);
+
+            // Fill form
+            document.getElementById("mcqId").value = mcq.id || '';
+            questionTextarea.value = decodedQuestion.replace(/\\n/g, "\n");
+
+            // Clear previous options
+            optionsContainer.innerHTML = "";
+            correctOptionSelect.innerHTML = '<option value="" disabled selected>Select Correct Option</option>';
+
+            // Parse stored options: "a. First", "b. Second", ...
+            const options = decodedOptionText.split(/,\s*(?=[a-z]\.)/i).map(o => o.trim());
+
+            options.forEach((opt, index) => {
+              if (!opt) return;
+              const text = opt.replace(/^[a-z]\.\s*/i, '').trim();
+              const label = String.fromCharCode(97 + index); // a, b, c, d
+
+              // Create option input field
+              const input = document.createElement("input");
+              input.type = "text";
+              input.classList.add("option-box");
+              input.placeholder = `Option ${label.toUpperCase()}`;
+              input.value = text;
+              input.required = true;
+              input.dataset.label = label;
+              optionsContainer.appendChild(input);
+
+              // Add to correct answer dropdown
+              const optEl = document.createElement("option");
+              optEl.value = label;
+              optEl.textContent = label.toUpperCase();
+              correctOptionSelect.appendChild(optEl);
+            });
+
+            // Auto-select correct option and language
+            if (mcq.correctOption) {
+              correctOptionSelect.value = mcq.correctOption.toLowerCase();
+            }
+            if (mcq.languageName) {
+              languageSelect.value = mcq.languageName; // NOW WORKS!
+              console.log("Language auto-selected:", mcq.languageName);
+            }
+
+            sessionStorage.removeItem("mcqToEdit");
+          } catch (e) {
+            console.error("Failed to load MCQ for edit:", e);
+            alert("Could not load question. Please try again.");
+          }
+        }
+      })
+      .catch(err => {
+        console.error("Error loading languages:", err);
+        alert("Failed to load languages. Please refresh the page.");
       });
 
-    // --- ENHANCED AUTO-FILL MCQ DATA WHEN EDITING ---
-    const storedData = sessionStorage.getItem("mcqToEdit");
-    
-    if (storedData) {
-      try {
-        const mcq = JSON.parse(storedData);
-        
-        // Handle encoded data
-        const decodeText = (text, isEncoded) => {
-          if (!isEncoded) {
-            // If not encoded, handle simple quote replacement
-            return text.replace(/&quot;/g, '"');
-          }
-          try {
-            return decodeURIComponent(escape(atob(text)));
-          } catch (e) {
-            console.error("Decoding failed, returning as-is:", e);
-            return text; // Return as-is if decoding fails
-          }
-        };
-        
-        const isEncoded = mcq.encoded || false;
-        const decodedQuestion = decodeText(mcq.question, isEncoded);
-        const decodedOptionText = decodeText(mcq.optionText, isEncoded);
-
-        // Validate required fields
-        if (!decodedQuestion || !decodedOptionText) {
-          throw new Error("Missing required MCQ data after decoding");
-        }
-
-        const languageSelect = document.getElementById("languageName");
-
-        // Set form values
-        document.getElementById("mcqId").value = mcq.id || '';
-        
-        // Set question - handle newlines properly
-        const questionValue = decodedQuestion.replace(/\\n/g, "\n");
-        questionTextarea.value = questionValue;
-
-        // Clear and rebuild options
-        optionsContainer.innerHTML = "";
-        correctOptionSelect.innerHTML = '<option value="" disabled selected>Select Correct Option</option>';
-
-        // Parse options more robustly
-        const options = decodedOptionText.split(',').map(opt => opt.trim()).filter(opt => opt);
-
-        if (options.length === 0) {
-          throw new Error("No valid options found");
-        }
-
-        // Create option inputs - KEEPING YOUR ORIGINAL CORRECT OPTION CODE
-        options.forEach((opt, index) => {
-          if (opt) {
-            // Extract option value without the label (a., b., etc.)
-            const optionValue = opt.replace(/^[a-z]\.\s*/i, '').trim();
-            const label = String.fromCharCode(97 + index);
-            
-            const input = document.createElement("input");
-            input.type = "text";
-            input.name = "optionText";
-            input.classList.add("option-box");
-            input.placeholder = `Option ${label}`;
-            input.required = true;
-            input.value = optionValue;
-            input.setAttribute("data-label", label);
-            optionsContainer.appendChild(input);
-
-            // Add to correct option dropdown - YOUR ORIGINAL CODE
-            const optionElement = document.createElement("option");
-            optionElement.value = String.fromCharCode(97 + index);
-            optionElement.textContent = String.fromCharCode(97 + index);
-            correctOptionSelect.appendChild(optionElement);
-          }
-        });
-
-        // Set correct option - YOUR ORIGINAL CODE
-        if (mcq.correctOption) {
-          setTimeout(() => {
-            const correctOption = mcq.correctOption.toLowerCase();
-            correctOptionSelect.value = correctOption;
-          }, 100);
-        }
-
-        // Set language
-        if (mcq.languageName) {
-          setTimeout(() => {
-            languageSelect.value = mcq.languageName;
-          }, 100);
-        }
-
-        // Clear session storage
-        sessionStorage.removeItem("mcqToEdit");
-        
-      } catch (error) {
-        console.error("Error loading MCQ data:", error);
-        alert("Error loading question data: " + error.message);
-      }
-    }
-
-    // --- Add new option dynamically ---
+    // Add new option (max 4)
     addOptionBtn.addEventListener('click', () => {
-      const count = optionsContainer.getElementsByTagName('input').length;
-      if (count >= 4) {
-        alert("You can only add up to 4 options.");
+      const currentCount = optionsContainer.querySelectorAll('.option-box').length;
+      if (currentCount >= 4) {
+        alert("Maximum 4 options allowed.");
         return;
       }
-      
-      const label = String.fromCharCode(97 + count);
-      const newInput = document.createElement('input');
-      newInput.type = 'text';
-      newInput.name = 'optionText';
-      newInput.placeholder = `Option ${label}`;
-      newInput.classList.add("option-box");
-      newInput.required = true;
-      newInput.setAttribute('data-label', label);
-      optionsContainer.appendChild(newInput);
+      const label = String.fromCharCode(97 + currentCount); // a, b, c, d
 
-      // YOUR ORIGINAL CORRECT OPTION CODE
-      const option = document.createElement("option");
-      option.value = String.fromCharCode(97 + count);
-      option.textContent = String.fromCharCode(97 + count);
-      correctOptionSelect.appendChild(option);
+      const input = document.createElement("input");
+      input.type = "text";
+      input.classList.add("option-box");
+      input.placeholder = `Option ${label.toUpperCase()}`;
+      input.required = true;
+      input.dataset.label = label;
+      optionsContainer.appendChild(input);
+
+      const opt = document.createElement("option");
+      opt.value = label;
+      opt.textContent = label.toUpperCase();
+      correctOptionSelect.appendChild(opt);
     });
 
-    // --- Enhanced form submission ---
-    form.addEventListener('submit', (event) => {
-      // Remove any existing hidden inputs
-      const existingHiddenInputs = form.querySelectorAll('input[name="optionText"][type="hidden"]');
-      existingHiddenInputs.forEach(input => input.remove());
+    // Form submit - inject optionsJson
+    form.addEventListener('submit', (e) => {
+      // Remove old optionsJson if exists
+      const oldJson = form.querySelector('input[name="optionsJson"]');
+      if (oldJson) oldJson.remove();
 
-      // Collect options
-      const optionInputs = document.querySelectorAll('input[name="optionText"].option-box');
-      const options = Array.from(optionInputs)
-        .map((input, index) => {
-          const value = input.value.trim();
-          if (value) {
-            const label = String.fromCharCode(97 + index);
-            return `${label}. ${value}`;
-          }
-          return null;
-        })
-        .filter(option => option !== null);
+      const inputs = optionsContainer.querySelectorAll('.option-box');
+      const values = Array.from(inputs)
+        .map(i => i.value.trim())
+        .filter(v => v !== "");
 
-      // Validate
-      if (options.length < 2) {
-        event.preventDefault();
-        alert("Please provide at least 2 valid options.");
+      if (values.length < 2) {
+        e.preventDefault();
+        alert("At least 2 options are required.");
         return;
       }
-
-      if (options.length > 4) {
-        event.preventDefault();
-        alert("You cannot have more than 4 options.");
+      if (values.length > 4) {
+        e.preventDefault();
+        alert("Maximum 4 options allowed.");
         return;
       }
-
       if (!correctOptionSelect.value) {
-        event.preventDefault();
+        e.preventDefault();
         alert("Please select the correct option.");
         return;
       }
 
-      // Create hidden input with option text
-      const optionText = options.join(', ');
-      const hiddenInput = document.createElement('input');
-      hiddenInput.type = 'hidden';
-      hiddenInput.name = 'optionText';
-      hiddenInput.value = optionText;
-      form.appendChild(hiddenInput);
+      // Inject JSON array as hidden field
+      const hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.name = 'optionsJson';
+      hidden.value = JSON.stringify(values);
+      form.appendChild(hidden);
+
+      console.log("Updating MCQ with:", { id: document.getElementById("mcqId").value, values });
     });
   });
   </script>

@@ -13,7 +13,6 @@
 			}
         .parent1 {
             font-family: Arial, sans-serif;
-            /*background: #f4f6f9;*/
             display: flex;
             justify-content: center;
             align-items: center;
@@ -105,8 +104,8 @@
 			        This exam must be taken using <strong>Safe Exam Browser</strong> for a secure testing environment.
 			    </p>
 			    
-			    <a href="${pageContext.request.contextPath}/exammodule.seb"
-				download = "exammodule.seb"
+			    <a href="${pageContext.request.contextPath}/examportal.seb"
+				download = "examportal.seb"
 			       class="btn btn-success btn-lg"
 			       style="padding: 12px 24px; font-size: 16px; margin: 10px;">
 			       📥 Download SEB Configuration File
@@ -142,7 +141,7 @@
 				
 														    <label for="pwd">Password</label>
 														    <div class="password-wrapper">
-														        <input  id="pwd" name="pwd" name="password" placeholder="Enter Your Password" required >
+														        <input  id="pwd" name="pwd" type="text" name="password" placeholder="Enter Your Password" required >
 														        <img src="${pageContext.request.contextPath}/images/hide.png"
 														             alt="Toggle Password" class="toggle-password" onclick="togglePassword()">
 														    </div>

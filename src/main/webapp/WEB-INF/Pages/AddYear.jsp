@@ -96,7 +96,7 @@
 <p class="role-1">Passout</p>
 <div class="role-form">
 <div>
-<input type="text" class="box" id="roleName" name="year" placeholder="Enter Your Passout Year" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="4">
+<input type="text" class="box" id="roleName" name="year" placeholder="Enter Your Passout Year">
 <input type="hidden" id="roleId" name="id">
 </div>
 <div class="add-btn">
@@ -152,20 +152,33 @@ document.getElementById("roleForm").addEventListener("submit", async (event) => 
       payload = JSON.stringify({ year: roleName });
     }
 
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: payload
-    });
+	const response = await fetch(url, {
+			  method: method,
+			  headers: {
+			    "Content-Type": "application/json"
+			  },
+			  body: payload
+			});
 
-    if (!response.ok) {
-      throw new Error(`Failed to ${roleId ? "update" : "save"} passout`);
-    }
+			// ✅ ADD THIS BLOCK (IMPORTANT)
+			let data = {};
+			const contentType = response.headers.get("content-type");
 
-    const responseText = await response.text();
-    alert(`${roleId ? "Passout updated" : "Passout added"} successfully`);
+			if (contentType && contentType.includes("application/json")) {
+			  data = await response.json();
+			} else {
+			  const text = await response.text();
+			  data = { message: text };
+			}
+
+			// ✅ ERROR HANDLING
+			if (!response.ok) {
+			  alert(data.message || "Something went wrong");
+			  return;
+			}
+
+			// ✅ SUCCESS
+			alert(data.message || (roleId ? "Updated successfully" : "Added successfully"));
     document.getElementById("roleName").value = "";
     document.getElementById("roleId").value = "";
     actionButton.textContent = "Add";

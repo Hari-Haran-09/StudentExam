@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Exam Table</title>
+<title>Exam List</title>
 <style>
   .pagination {
     margin-top: 15px;

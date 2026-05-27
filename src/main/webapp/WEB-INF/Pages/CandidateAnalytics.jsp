@@ -115,7 +115,7 @@ width: 20%;
             </div>
  
             <div style="width:50%; box-shadow: 0 0 8px rgba(0,0,0,0.1); border: 1.5px solid rgba(0,0,0,0.1);">
-                <h3 style="color:black; text-align: center">Candidates</h3>
+                <h3 style="color:black; text-align: center"> Registered Candidates</h3>
                 <canvas id="candidateTypeChart" style="width:100%; height:150px;"></canvas>
             </div>
         </div>
@@ -125,7 +125,7 @@ width: 20%;
  
  
 <div style="border: 2px solid gray; width: 95%; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3)">
-<h3 style="color: black; width: fit-content; margin-left: 2.5%">Recent Candidate Details</h3>
+<h3 style="color: black; width: fit-content; margin-left: 2.5%">Recent Exam Candidates Details</h3>
 <div style="width: 90%; padding: 10px; display: flex; align-items: center; gap: 10px; justify-content: end">
   <label for="statusFilter" style="font-weight: bold; color: black;">Filter by Status:</label>
   
@@ -143,13 +143,15 @@ width: 20%;
         <tr>
           <th style="width:30px; text-align:center; padding:4px;">SL</th>
           <th style="width:200px; text-align:center; padding:4px;">Full Name</th>
-          <th style="width:90px; text-align:center; padding:4px;">Gender</th>
+          <th style="width:90px; text-align:center; padding:4px;">Email</th>
+		  <th style="width:90px; text-align:center; padding:4px;">Gender</th>
           <th style="width:180px; text-align:center; padding:4px;">Contact Number</th>
           <th style="width:230px; text-align:center; padding:4px;">City</th>
 		  <th style="width:230px; text-align:center; padding:4px;">State</th>
-          <th style="width:170px; text-align:center; padding:4px;">Role</th>
+          <th style="width:170px; text-align:center; padding:4px;">Registered Role</th>
           <th style="width:190px; text-align:center; padding:4px;">Course</th>
           <th style="width:230px; text-align:center; padding:4px;">Specialization</th>
+		  <th style="width:170px; text-align:center; padding:4px;">Language</th>
           <th style="width:90px; text-align:center; padding:4px;">Marks</th>
           <th style="width:100px; text-align:center; padding:4px;">Status</th>
         </tr>
@@ -252,12 +254,18 @@ fetch("<%=request.getContextPath()%>/student/registerrr")
     .then(response => response.json())
     .then(data => {
         let male = 0, female = 0, others = 0;
-
-        data.forEach(student => {
-            if (student.gender.toLowerCase() === "male") male++;
-            else if (student.gender.toLowerCase() === "female") female++;
-            else others++;
-        });
+		data.forEach(student => {
+				    const gender = (student.gender || "").toLowerCase();
+		 
+				    if (gender === "male") male++;
+				    else if (gender === "female") female++;
+				    else others++;
+				});
+        //data.forEach(student => {
+            //if (student.gender.toLowerCase() === "male") male++;
+            //else if (student.gender.toLowerCase() === "female") female++;
+            //else others++;
+        //});
 
         const genderCtx = document.getElementById('genderChart').getContext('2d');
         new Chart(genderCtx, {
@@ -393,12 +401,14 @@ function displayFilteredData(data) {
                 <td style="width:30px; text-align:center; padding:4px;">\${startIndex + index + 1}</td>
                 <td style="width:200px; text-align:center; padding:4px;">\${student.name}</td>
                 <td style="width:90px; text-align:center; padding:4px;">\${student.email}</td>
+				<td style="width:90px; text-align:center; padding:4px;">\${student.gender}</td>
                 <td style="width:180px; text-align:center; padding:4px;">\${student.phone}</td>
                 <td style="width:230px; text-align:center; padding:4px;">\${student.city}</td>
                 <td style="width:230px; text-align:center; padding:4px;">\${student.state}</td>
                 <td style="width:170px; text-align:center; padding:4px;">\${student.role}</td>
                 <td style="width:190px; text-align:center; padding:4px;">\${student.course}</td>
                 <td style="width:230px; text-align:center; padding:4px;">\${student.specialization}</td>
+				<td style="width:230px; text-align:center; padding:4px;">\${student.languageName}</td>
                 <td style="width:90px; text-align:center; padding:4px;">\${student.totalMarks}</td>
                 <td style="width:100px; text-align:center; padding:4px; color:\${statusColor}; font-weight:bold;">
                     \${student.status}

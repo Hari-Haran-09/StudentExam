@@ -1,23 +1,18 @@
 package com.exam.Util;
 
-
-
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.springframework.stereotype.Component;
-
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
  
 @Component
 public class OcrUtil {
- 
- 
-	
-	private static final String TESSDATA_PATH="C:\\Users\\Anil\\Desktop\\Aadhar Verification\\tessdata";
+
+	private static final String TESSDATA_PATH="C:\\AadharVerification\\nssexam\\tessdata";
+
     public static String extractAadharNumber(String imagePath) throws TesseractException {
         String rawText = extractText(imagePath);
         Pattern pattern = Pattern.compile("\\d{4}\\s?\\d{4}\\s?\\d{4}");

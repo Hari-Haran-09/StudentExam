@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Add Course</title>
+<title>Add Experience</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
   body {
@@ -152,20 +152,33 @@ document.getElementById("roleForm").addEventListener("submit", async (event) => 
       payload = JSON.stringify({ experience: roleName });
     }
 
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: payload
-    });
+	const response = await fetch(url, {
+			  method: method,
+			  headers: {
+			    "Content-Type": "application/json"
+			  },
+			  body: payload
+			});
 
-    if (!response.ok) {
-      throw new Error(`Failed to ${roleId ? "update" : "save"} experience`);
-    }
+			// ✅ ADD THIS BLOCK (IMPORTANT)
+			let data = {};
+			const contentType = response.headers.get("content-type");
 
-    const responseText = await response.text();
-    alert(`${roleId ? "Experience updated" : "Experience added"} successfully`);
+			if (contentType && contentType.includes("application/json")) {
+			  data = await response.json();
+			} else {
+			  const text = await response.text();
+			  data = { message: text };
+			}
+
+			// ✅ ERROR HANDLING
+			if (!response.ok) {
+			  alert(data.message || "Something went wrong");
+			  return;
+			}
+
+			// ✅ SUCCESS
+			alert(data.message || (roleId ? "Updated successfully" : "Added successfully"));
     document.getElementById("roleName").value = "";
     document.getElementById("roleId").value = "";
     actionButton.textContent = "Add";

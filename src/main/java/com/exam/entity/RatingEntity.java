@@ -2,7 +2,7 @@ package com.exam.entity;
  
  
 import java.time.LocalDateTime;
-
+ 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,10 +19,7 @@ private LocalDateTime dateTime;
 private String name;
 private String email;
 private String role;
-
-
-
-
+ 
 public String getRole() {
 	return role;
 }
@@ -68,5 +65,5 @@ public void setFeedback(String feedback) {
 public RatingEntity() {
 	super();
 }
-
+ 
 }

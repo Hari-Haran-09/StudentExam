@@ -102,6 +102,10 @@
 	            <button type="button" class="admin1" style="background: #2178BD; color: white;">
 	                <a href="${pageContext.request.contextPath}/student/admin1" style="color:white; text-decoration: none">Admin</a>
 	            </button>
+				<button type="button" class="letstart" onclick="startExam()">
+					                Let's Start <img src="${pageContext.request.contextPath}/images/arrow.png" alt="Logo" width="10" height="10">
+					            </button>
+				
 	        <%
 	            } else {
 	        %>
@@ -112,7 +116,7 @@
 	            }
 	        %>
 	    </div>
-
+ 
     <script>
     function startExam() {
         // Simply redirect to exam details

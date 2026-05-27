@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Coding Questions</title>
+<title>Add Coding Questions Page</title>
  
 <!-- Chart.js CDN for CandidateAnalytics -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

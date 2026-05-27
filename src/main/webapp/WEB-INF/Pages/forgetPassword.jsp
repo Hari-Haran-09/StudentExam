@@ -59,37 +59,36 @@
         button:hover {
             background: #0056b3;
         }
-		
-		
+
 		.password-wrapper {
-						    position: relative;
-						    display: flex;
-						    align-items: center;
-						}
-					 
-						.password-wrapper input {
-						    width: 100%;
-						    padding-right: 40px;
-						}
-					 
-						.toggle-password {
-						    position: absolute;
-						    right: 10px;
-						    width: 22px;
-						    height: 22px;
-						    cursor: pointer;
-						    opacity: 0.7;
-						    transition: opacity 0.2s ease;
-							/*border: 2px solid red;*/
-							margin-bottom: 13px;
-						}
-					 
-						.toggle-password:hover {
-						    opacity: 1;
-						}
+		    position: relative;
+		    display: flex;
+		    align-items: center;
+		}
+
+		.password-wrapper input {
+		    width: 100%;
+		    padding-right: 40px;
+		}
+
+		.toggle-password {
+		    position: absolute;
+		    right: 10px;
+		    width: 22px;
+		    height: 22px;
+		    cursor: pointer;
+		    opacity: 0.7;
+		    transition: opacity 0.2s ease;
+		}
+
+		.toggle-password:hover {
+		    opacity: 1;
+		}
     </style>
 </head>
 <body>
+
+
 	<div class="div-img">
 			    <img src="${pageContext.request.contextPath}/images/logo.png" alt="Logo" width="200" height="70" style="">
 			    </div>
@@ -99,14 +98,14 @@
 		        <form id="forgetform" action="forget" method="post">
 		            <label for="email">Email</label>
 		            <input type="email" id="email" name="email" placeholder="Enter Your Email" required>
-					<!--<label for="pwd">New Password</label>
-		           <input type="password" id="password" name="password" placeholder="Enter Your Password" required>-->
-				   <label for="pwd">New Password</label>
-				   														    <div class="password-wrapper">
-				   														        <input  id="password" name="password" placeholder="Enter Your Password" required >
-				   														        <img src="${pageContext.request.contextPath}/images/hide.png"
-				   														             alt="Toggle Password" class="toggle-password" onclick="togglePassword()">
-				   														    </div>
+					<label>Password:</label>
+								    <div class="password-wrapper">
+								        <input type="password" id="password" name="password" placeholder="Enter Your Password" required
+								            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$"
+								            title="Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character.">
+								        <img src="${pageContext.request.contextPath}/images/hide.png"
+								             alt="Toggle Password" class="toggle-password" onclick="togglePassword()">
+								    </div>
 		            <button type="submit">Forget</button>
 		        </form>
 		    </div>
@@ -118,21 +117,25 @@
 					        e.preventDefault();
 					    }
 					});
-					
-					
-					function togglePassword() {
-												    const passwordInput = document.getElementById("password");
-												    const icon = document.querySelector(".toggle-password");
-
-												    if (passwordInput.type === "password") {
-												        passwordInput.type = "text";
-												        icon.src = "${pageContext.request.contextPath}/images/eye.png";
-												    } else {
-												        passwordInput.type = "password";
-												        icon.src = "${pageContext.request.contextPath}/images/hide.png";
-												    }
-												}
 	</script>
+	<script>
+	function togglePassword() {
+	    const passwordInput = document.getElementById("password");
+	    const icon = document.querySelector(".toggle-password");
+	 
+	    if (passwordInput.type === "password") {
+	        passwordInput.type = "text";
+	        icon.src = "${pageContext.request.contextPath}/images/eye.png";
+	    } else {
+	        passwordInput.type = "password";
+	        icon.src = "${pageContext.request.contextPath}/images/hide.png";
+	    }
+	}
+	</script>
+
+		
+	
+	
 </body>
 </html>
  

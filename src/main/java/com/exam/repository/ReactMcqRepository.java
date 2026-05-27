@@ -8,4 +8,6 @@ import com.exam.entity.ReactMcq;
 
 public interface ReactMcqRepository extends JpaRepository<ReactMcq, Long> {
 	List<ReactMcq> findByLanguageName(String languageName);
+	
+	int countByLanguageName(String languageName);
 }

@@ -142,25 +142,25 @@
 		                <label>Full Name:</label>
 		                <input type="text" id="name" name="name" required placeholder="Enter Your Full Name" value="<%= session.getAttribute("userName") %>">
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Role:</label>
 		                <select id="role" name="role" required>
 		                    <option value="" disabled selected>Select Role</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Mobile Number:</label>
 		                <input type="tel" id="phone" name="phone" required maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter Your Mobile Number" value="<%= session.getAttribute("phoneNo") %>">
 		            </div>
-		 
+		
 		         <div class="form-group">
 		                <label>Email:</label>
 		                <input type="email" id="email" name="email" placeholder="Enter Your Email"
 		                       value="<%= session.getAttribute("userEmail") %>" readonly>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Gender:</label>
 		                <select id="gender" name="gender" required>
@@ -169,55 +169,55 @@
 		                    <option value="Female">Female</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Course:</label>
-		                <select id="course" name="course" required>
+		                <select id="course" name="course" >
 		                    <option value="" disabled selected>Select Course</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Specialization:</label>
-		                <select id="specialization" name="specialization" required>
+		                <select id="specialization" name="specialization" >
 		                    <option value="" disabled selected>Select Specialization</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Passout Year:</label>
-		                <select id="passedout" name="passedout" required>
+		                <select id="passedout" name="passedout" >
 		                    <option value="" disabled selected>Select Year</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>College Name:</label>
-		                <input type="text" id="collegeName" name="collegeName" required placeholder="Enter Your College Name" value="<%= session.getAttribute("collegeName") %>">
+		                <input type="text" id="collegeName" name="collegeName" placeholder="Enter Your College Name" value="<%= session.getAttribute("collegeName") %>">
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>Experience:</label>
-		                <select id="experience" name="experience" required>
+		                <select id="experience" name="experience" >
 		                    <option value="" disabled selected>Select Experience</option>
 		                </select>
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>City:</label>
-		                <input type="text" id="city" name="city" required placeholder="Enter Your City" value="<%= session.getAttribute("city") %>">
+		                <input type="text" id="city" name="city"  placeholder="Enter Your City" value="<%= session.getAttribute("city") %>">
 		            </div>
-		 
+		
 		            <div class="form-group">
 		                <label>State:</label>
-		                <input type="text" id="state" name="state" required placeholder="Enter Your State" value="<%= session.getAttribute("state") %>">
+		                <input type="text" id="state" name="state"  placeholder="Enter Your State" value="<%= session.getAttribute("state") %>">
 		            </div>
-		 
+		
 		            <div class="form-actions">
 		                <input type="submit" value="Update Profile">
 		            </div>
 		        </form>
-		 
+		
 		        <p class="already-text" style="">
 					If you don’t want to update, you can
 		            <button type="button" class="login-text" onclick="window.location.href='login'">
@@ -226,7 +226,7 @@
 		        </p>
 		    </div>
 	</div>
- <script>
+<script>
 	const currentRole = "<%= session.getAttribute("role") %>";
 	    const currentGender = "<%= session.getAttribute("gender") %>";
 	    const currentCourse = "<%= session.getAttribute("course") %>";
@@ -237,7 +237,7 @@
 		    const genderSelect = document.getElementById("gender");
 		    if (currentGender) genderSelect.value = currentGender;
 		});
- </script>
+</script>
 	<!-- Separate scripts for each dropdown -->
 	<script>
 	window.addEventListener("DOMContentLoaded", () => {
@@ -255,7 +255,7 @@
 	        });
 	});
 	</script>
-
+ 
 	<script>
 	window.addEventListener("DOMContentLoaded", () => {
 	    fetch("${pageContext.request.contextPath}/student/getCourses")
@@ -273,7 +273,7 @@
 	});
 	</script>
 	
-
+ 
 	<script>
 	window.addEventListener("DOMContentLoaded", () => {
 	    fetch("${pageContext.request.contextPath}/student/getSpecializations")
@@ -290,7 +290,7 @@
 	        });
 	});
 	</script>
-
+ 
 	<script>
 	window.addEventListener("DOMContentLoaded", () => {
 	    fetch("${pageContext.request.contextPath}/student/getPassedout")
@@ -307,7 +307,7 @@
 	        });
 	});
 	</script>
-
+ 
 	<script>
 	window.addEventListener("DOMContentLoaded", () => {
 	    fetch("${pageContext.request.contextPath}/student/getExperience")
@@ -324,12 +324,60 @@
 	        });
 	});
 	
-	document.getElementById("updateform").addEventListener("submit", function (e) {
-						    const confirmation = confirm("Do you want to update the data?");
-						    if (!confirmation) {
-						        e.preventDefault();
-						    }
-						});
-	</script></body>
+	
+	</script>
+	<script>
+			document.getElementById("updateform").addEventListener("submit", function (e) {
+			    const roleSelect = document.getElementById('role');
+			    const selectedRole = roleSelect.value;
+			    
+			    // Basic validation for all roles
+			    const name = document.getElementById('name').value;
+			    const phone = document.getElementById('phone').value;
+			    const email = document.getElementById('email').value;
+			    const gender = document.getElementById('gender').value;
+				const password = document.getElementById('password').value;
+			    
+			    if (!name || !phone || !email || !gender || !password) {
+			        alert("Please fill all basic required fields: Full Name, Mobile, Email,Password and Gender");
+			        e.preventDefault();
+			        return;
+			    }
+			    
+			   
+			    
+			   
+			    // For non-Admin roles, validate all fields
+			    if (selectedRole !== 'Admin') {
+			        const course = document.getElementById('course').value;
+			        const specialization = document.getElementById('specialization').value;
+			        const passedout = document.getElementById('passedout').value;
+			        const collegeName = document.getElementById('collegeName').value;
+			        const experience = document.getElementById('experience').value;
+			        const city = document.getElementById('city').value;
+			        const state = document.getElementById('state').value;
+			        const password = document.getElementById('password').value;
+			        
+			        if (!name || !phone || !email || !gender || !course || !specialization || !passedout || !collegeName || !experience || !city || !state || !password) {
+			            alert("Please fill all required fields");
+			            e.preventDefault();
+			            return;
+			        }
+			        
+			        // Password pattern validation for non-Admin roles
+			        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+			        if (!passwordPattern.test(password)) {
+			            alert("Password must be at least 8 characters long and include uppercase and lowercase letters, a number, and a special character");
+			            e.preventDefault();
+			            return;
+			        }
+			    }
+				const confirmation = confirm("Do you want to update the data?");
+								    if (!confirmation) {
+								        e.preventDefault();
+								    }
+								});
+			    
+			</script>
+</body>
 </html>
- 

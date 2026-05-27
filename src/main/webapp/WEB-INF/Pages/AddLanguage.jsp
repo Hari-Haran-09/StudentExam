@@ -152,20 +152,33 @@ document.getElementById("roleForm").addEventListener("submit", async (event) => 
       payload = JSON.stringify({ languageName: roleName });
     }
 
-    const response = await fetch(url, {
-      method: method,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: payload
-    });
+	const response = await fetch(url, {
+			  method: method,
+			  headers: {
+			    "Content-Type": "application/json"
+			  },
+			  body: payload
+			});
 
-    if (!response.ok) {
-      throw new Error(`Failed to ${roleId ? "update" : "save"} language`);
-    }
+			// ✅ ADD THIS BLOCK (IMPORTANT)
+			let data = {};
+			const contentType = response.headers.get("content-type");
 
-    const responseText = await response.text();
-    alert(`${roleId ? "Language updated" : "Language added"} successfully`);
+			if (contentType && contentType.includes("application/json")) {
+			  data = await response.json();
+			} else {
+			  const text = await response.text();
+			  data = { message: text };
+			}
+
+			// ✅ ERROR HANDLING
+			if (!response.ok) {
+			  alert(data.message || "Something went wrong");
+			  return;
+			}
+
+			// ✅ SUCCESS
+			alert(data.message || (roleId ? "Updated successfully" : "Added successfully"));
     document.getElementById("roleName").value = "";
     document.getElementById("roleId").value = "";
     actionButton.textContent = "Add";

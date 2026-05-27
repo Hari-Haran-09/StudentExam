@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Add Year-Of-PassedOut Page</title>
+<title>Add Year Of PassedOut</title>
  
 <!-- Chart.js CDN for CandidateAnalytics -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

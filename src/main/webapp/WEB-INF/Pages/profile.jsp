@@ -46,10 +46,10 @@
     }
     .update{
     margin-left: 10px;
-    padding-top: 11px;
-    padding-bottom: 11px;
-    padding-left: 33px;
-    padding-right: 33px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 27px;
+    padding-right: 27px;
     background: #2B2BDA;
     color: white;
 	width: fit-content;
@@ -57,10 +57,10 @@
     }
     .home{
     margin-left: 10px;
-    padding-top: 11px;
-    padding-bottom: 11px;
-    padding-left:29px;
-    padding-right: 29px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left:17px;
+    padding-right: 17px;
     background: #0D9D53;
     color: white;
     border-radius: 8px;

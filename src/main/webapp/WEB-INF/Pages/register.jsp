@@ -19,7 +19,7 @@
         /*height: 100vh;*/
         margin: 0;
     }
-
+ 
     .form-container {
 		margin-top: 10px;
         background: #ffffff;
@@ -34,34 +34,34 @@
 		/*height: 81vh;*/
 		margin-bottom: 25px;
     }
-
+ 
     h2 {
         text-align: center;
         color: #333;
         margin-bottom: 19px;
     }
-
+ 
     .regForm {
         display: flex;
         flex-wrap: wrap;
-        gap: 3px; 
+        gap: 3px;
         justify-content: space-between;
     }
-
+ 
     .form-group {
         width: 45%;
         display: flex;
         flex-direction: column;
         margin-bottom: 11px;
     }
-
+ 
     .form-group label {
         font-weight: bold;
         color: #555;
         margin-bottom: 10px;
         text-align: left;
     }
-
+ 
     .form-group input,
     .form-group select {
         padding: 7px;
@@ -70,7 +70,7 @@
         font-size: 14px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
+ 
     .form-actions {
         width: 100%;
         display: flex;
@@ -78,7 +78,7 @@
         margin-top: 11px;
 		margin-bottom: 5px;
     }
-
+ 
     .form-actions input[type="submit"] {
         background: #2178BD;
         color: white;
@@ -92,11 +92,11 @@
 		padding-top: 8px;
 		padding-bottom: 8px;
     }
-
+ 
     .form-actions input[type="submit"]:hover {
         background: #0056b3;
     }
-
+ 
     @media (max-width: 600px) {
         .form-group { width: 100%; }
     }
@@ -141,6 +141,46 @@
 	    color: #666;
 	    font-size: 0.9em;
 	}
+
+	.loader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    backdrop-filter: blur(3px);
+}
+
+.spinner {
+    width: 55px;
+    height: 55px;
+    border: 5px solid #dcdcdc;
+    border-top: 5px solid #2178BD;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 18px;
+}
+
+#loadingText {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2178BD;
+    letter-spacing: 0.5px;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
 </style>
 </head>
 <body>
@@ -150,7 +190,7 @@
 	        alert("${error}");
 	    </script>
 	</c:if>
-
+ 
 	<c:if test="${not empty message}">
 	    <script>
 	        alert("${message}");
@@ -164,30 +204,30 @@
 	<div class="parent">
 		<div class="form-container">
 		    <h2>Sign Up</h2>
-
+ 
 		    <form class="regForm" id="registerform" action="${pageContext.request.contextPath}/student/register" method="post" enctype="multipart/form-data">
 		        <div class="form-group">
 		            <label>Full Name:</label>
 		            <input type="text" name="name" required placeholder="Enter Your Full Name" id="name">
 		        </div>
-
+ 
 		        <div class="form-group">
 		            <label>Role:</label>
 		            <select id="role" name="role" required onchange="toggleFields()">
 		                <option value="" disabled selected>Select Role</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group">
 		            <label>Mobile Number:</label>
 		            <input type="tel" name="phone" required maxlength="10" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter Your Mobile Number" id="phone">
 		        </div>
-
+ 
 		        <div class="form-group">
 		            <label>Email:</label>
 		            <input type="email" name="email" required placeholder="Enter Your Email" id="email">
 		        </div>
-
+ 
 		        <div class="form-group">
 		            <label>Gender:</label>
 		            <select name="gender" required id="gender">
@@ -196,50 +236,50 @@
 		                <option value="Female">Female</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group" id="courseGroup">
 		            <label>Course:</label>
-		            <select id="course" name="course">
+		            <select id="course" name="course" required>
 		                <option value="" disabled selected>Select Course</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group" id="specializationGroup">
 		            <label>Specialization:</label>
-		            <select id="specialization" name="specialization">
+		            <select id="specialization" name="specialization" required>
 		                <option value="" disabled selected>Select Specialization</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group" id="passedoutGroup">
 		            <label>Passout Year:</label>
-		            <select id="passedout" name="passedout">
+		            <select id="passedout" name="passedout" required>
 		                <option value="" disabled selected>Select Year</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group" id="collegeNameGroup">
 		            <label>College Name:</label>
-		            <input type="text" name="collegeName" placeholder="Enter Your College Name" id="collegeName">
+		            <input type="text" name="collegeName" required placeholder="Enter Your College Name" id="collegeName">
 		        </div>
-
+ 
 		        <div class="form-group" id="experienceGroup">
 		            <label>Experience:</label>
-		            <select id="experience" name="experience">
+		            <select id="experience" name="experience" required>
 		                <option value="" disabled selected>Select Experience</option>
 		            </select>
 		        </div>
-
+ 
 		        <div class="form-group" id="cityGroup">
 		            <label>City:</label>
-		            <input type="text" name="city" placeholder="Enter Your City" id="city">
+		            <input type="text" name="city" required placeholder="Enter Your City" id="city">
 		        </div>
-
+ 
 		        <div class="form-group" id="stateGroup">
 		            <label>State:</label>
-		            <input type="text" name="state" placeholder="Enter Your State" id="state">
+		            <input type="text" name="state" required placeholder="Enter Your State" id="state">
 		        </div>
-
+ 
 		        <div class="form-group password-field" id="passwordGroup">
 				    <label>Password:</label>
 				    <div class="password-wrapper">
@@ -251,21 +291,49 @@
 				    </div>
 				</div>
 				
-				<div class="form-group" id="aadharNumberGroup">
-				    <label>Aadhaar Number:</label>
-				    <input type="text" name="aadharNumber" placeholder="Enter Your Aadhar Number" id="aadharNumber">
-				</div>
-			 
-				<div class="form-group" id="aadharFileGroup">
-				    <label>Aadhaar File (Image):</label>
-				    <input type="file" name="aadharFile" accept="image/*" id="aadharFile">
-				</div>
+				<div style="display:flex; align-items:flex-end; gap:40px; flex-wrap:wrap; width:100%;">
 
-		        <div class="form-actions">
-		            <input type="submit" value="REGISTER">
-		        </div>
+    <div class="form-group" id="aadharNumberGroup">
+        <label>Aadhaar Number:</label>
+
+        <input
+            type="text"
+            id="aadharNumber"
+            name="aadharNumber"
+            required
+            maxlength="12"
+            placeholder="Enter Your Aadhaar Number"
+            style="width:100%;"
+        >
+    </div>
+
+    <div class="form-group" id="aadharFileGroup">
+        <label>Aadhaar File (.jpg, .png):</label>
+
+        <input
+            type="file"
+            id="aadharFile"
+            name="aadharFile"
+            required
+            accept="image/*"
+            style="max-width:300px;"
+        >
+
+        <input
+            type="hidden"
+            id="aadhaarVerified"
+            name="aadhaarVerified"
+            value="false"
+        >
+    </div>
+
+</div>
+							<div class="form-actions">
+								            <input type="submit" value="REGISTER">
+								        </div>
+							
 		    </form>
-
+ 
 		    <p style="margin-top:10px;">Already have an account?  <a href="${pageContext.request.contextPath}/student/login" style="text-decoration: none; color: #2178BD; padding-top: 10px">Sign in By User</a><a href="${pageContext.request.contextPath}/student/Adminlogin" style="text-decoration: none; color: #2178BD; padding-top: 10px; margin-left:15px">Sign in By Admin</a></p>
 		</div>
 	</div>
@@ -273,7 +341,92 @@
 	<div style="padding-bottom: 21px; text-center; margin: auto; width: fit-content">
 		<p>By logging in, you agree to our Privacy Policy & Terms of Use</p>
 	</div>
-
+	<script>
+	document.getElementById("verifyBtn").addEventListener("click", async (event) => {
+	  event.preventDefault();
+	
+	  const aadharNumber = document.getElementById("aadharNumber").value.trim();
+	  const aadharFile = document.getElementById("aadharFile").files[0];
+	
+	  // Validate Aadhar number
+	  if (!aadharNumber) {
+	    alert("Please enter Aadhar number");
+	    return;
+	  }
+	
+	  // Validate Aadhar number format (12 digits)
+	  if (!aadharNumber.match(/^\d{12}$/)) {
+	    alert("Please enter a valid 12-digit Aadhar number");
+	    return;
+	  }
+	
+	  // Validate Aadhar file
+	  if (!aadharFile) {
+	    alert("Please select an Aadhar file");
+	    return;
+	  }
+	
+	  // Validate file type
+	  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+	  if (!allowedTypes.includes(aadharFile.type)) {
+	    alert("Please upload only JPEG or PNG images");
+	    return;
+	  }
+	
+	
+	  const maxSize = 10 * 1024 * 1024;
+	  if (aadharFile.size > maxSize) {
+	    alert("File size should be less than 10MB");
+	    return;
+	  }
+	
+	  // Show loading state
+	  const verifyBtn = document.getElementById("verifyBtn");
+	  const originalText = verifyBtn.textContent;
+	  verifyBtn.textContent = "Verifying...";
+	  verifyBtn.disabled = true;
+	
+	  try {
+	    const url = "<%=request.getContextPath()%>/student/verifyAadhar";
+	
+	    // ✅ FIXED: Use correct parameter name
+	    const formData = new FormData();
+	    formData.append("aadharFile", aadharFile);  // This matches your backend parameter name
+	    formData.append("aadharNumber", aadharNumber);
+	
+	    const response = await fetch(url, {
+	      method: "POST",
+	      body: formData
+	    });
+	
+	    const result = await response.json();
+	
+	    if (result.success) {
+	      alert("✅ Aadhar verified successfully");
+	      verifyBtn.style.backgroundColor = "#28a745";
+	      verifyBtn.textContent = "Verified ✓";
+		  
+		  document.getElementById("aadhaarVerified").value = "true";
+	      
+	      // Optional: Enable main form submission or proceed to next step
+	      console.log("Aadhar verification successful");
+	    } else {
+	      alert("❌ Aadhar verification failed: " + result.message);
+	      verifyBtn.textContent = originalText;
+	      verifyBtn.disabled = false;
+		
+		  
+	    }
+	
+	  } catch (error) {
+	    console.error("Error verifying Aadhar:", error);
+	    alert("Something went wrong. Please try again.");
+	    verifyBtn.textContent = originalText;
+	    verifyBtn.disabled = false;
+		
+	  }
+	});
+	</script>
 <script>
 // Function to toggle field requirements based on role
 function toggleFields() {
@@ -330,21 +483,21 @@ function toggleFields() {
         makeRequired(aadharFileGroup, aadharFile);
     }
 }
-
+ 
 function makeOptional(fieldGroup, fieldElement) {
     fieldGroup.classList.add('optional-field');
     fieldElement.removeAttribute('required');
     // Clear any existing validation messages
     fieldElement.setCustomValidity('');
 }
-
+ 
 function makeRequired(fieldGroup, fieldElement) {
     fieldGroup.classList.remove('optional-field');
     fieldElement.setAttribute('required', 'required');
     // Clear any existing validation messages
     fieldElement.setCustomValidity('');
 }
-
+ 
 // Initialize fields on page load
 window.addEventListener("DOMContentLoaded", () => {
     // Load dropdown data
@@ -359,7 +512,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 roleSelect.appendChild(opt);
             });
         });
-
+ 
     fetch("${pageContext.request.contextPath}/student/getCourses")
         .then(res => res.json())
         .then(data => {
@@ -371,7 +524,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 courseSelect.appendChild(opt);
             });
         });
-
+ 
     fetch("${pageContext.request.contextPath}/student/getSpecializations")
         .then(res => res.json())
         .then(data => {
@@ -383,7 +536,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 specSelect.appendChild(opt);
             });
         });
-
+ 
     fetch("${pageContext.request.contextPath}/student/getPassedout")
         .then(res => res.json())
         .then(data => {
@@ -395,7 +548,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 yearSelect.appendChild(opt);
             });
         });
-
+ 
     fetch("${pageContext.request.contextPath}/student/getExperience")
         .then(res => res.json())
         .then(data => {
@@ -411,12 +564,14 @@ window.addEventListener("DOMContentLoaded", () => {
     // Initialize field states
     toggleFields();
 });
-
+ 
 // Enhanced form submission handler
-document.getElementById("registerform").addEventListener("submit", function (e) {
+document.getElementById("registerform").addEventListener("submit", async function (e) {
     const roleSelect = document.getElementById('role');
     const selectedRole = roleSelect.value;
     
+	document.getElementById("loadingBox").style.display = "flex";
+
     // Basic validation for all roles
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
@@ -468,14 +623,78 @@ document.getElementById("registerform").addEventListener("submit", function (e) 
             e.preventDefault();
             return;
         }
-    }
-    
-    const confirmation = confirm(`Do you want to register`);
-    if (!confirmation) {
-        e.preventDefault();
-    }
-});
+    }e.preventDefault();
 
+const aadharNumber = document.getElementById("aadharNumber").value.trim();
+const aadharFile = document.getElementById("aadharFile").files[0];
+
+if (!aadharNumber.match(/^\d{12}$/)) {
+    alert("Please enter a valid 12-digit Aadhaar number");
+    return;
+}
+
+if (!aadharFile) {
+    alert("Please upload Aadhaar file");
+    return;
+}
+
+const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
+if (!allowedTypes.includes(aadharFile.type)) {
+    alert("Please upload only JPG or PNG image");
+    return;
+}
+
+const maxSize = 10 * 1024 * 1024;
+
+if (aadharFile.size > maxSize) {
+    alert("File size should be less than 10MB");
+    return;
+}
+
+try {
+	// Show loading animation
+document.getElementById("loadingBox").style.display = "flex";
+document.getElementById("loadingText").innerText = "Verifying Aadhaar...";
+
+    const formData = new FormData();
+
+    formData.append("aadharFile", aadharFile);
+    formData.append("aadharNumber", aadharNumber);
+
+    const response = await fetch(
+        "<%=request.getContextPath()%>/student/verifyAadhar",
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+
+    const result = await response.json();
+
+    if (!result.success) {
+		document.getElementById("loadingBox").style.display = "none";
+        alert("❌ Aadhaar verification failed");
+        return;
+    }
+
+    document.getElementById("aadhaarVerified").value = "true";
+
+} catch(error) {
+    document.getElementById("loadingBox").style.display = "none";
+    alert("Verification failed. Please try again.");
+    return;
+}
+    const confirmation = confirm(`Do you want to register`);
+    if (confirmation) {
+	document.getElementById("loadingText").innerText = "Registering..."; 
+    this.submit();
+    }else {
+
+    document.getElementById("loadingBox").style.display = "none";
+}
+});
+ 
 function togglePassword() {
     const passwordInput = document.getElementById("password");
     const icon = document.querySelector(".toggle-password");
@@ -489,7 +708,7 @@ function togglePassword() {
     }
 }
 </script>
-
+ 
 <script src="internet-check.js">
 	window.addEventListener('load', () => {
 	  function showPopup(message, color) {
@@ -512,22 +731,26 @@ function togglePassword() {
 	    popup.textContent = message;
 	    popup.style.display = 'block';
 	  }
-
+ 
 	  function hidePopup() {
 	    const popup = document.getElementById('internet-popup');
 	    if (popup) popup.style.display = 'none';
 	  }
-
+ 
 	  window.addEventListener('offline', () => {
 	    showPopup('⚠️ No Internet Connection! Please check your network.', '#ff4444');
 	  });
-
+ 
 	  window.addEventListener('online', () => {
 	    showPopup('✅ Internet reconnected!', '#4CAF50');
 	    setTimeout(hidePopup, 3000);
 	  });
 	});
+	
 </script>
-
+        <div id="loadingBox" class="loader">
+    <div class="spinner"></div>
+    <div id="loadingText">Verifying Aadhaar...</div>
+</div>
 </body>
 </html>

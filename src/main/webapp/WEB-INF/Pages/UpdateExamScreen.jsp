@@ -210,23 +210,45 @@
         </div>
     </div>
 
-    <!-- Language Selection -->
-    <form action="mcq" method="get">
-        <div style="width: 80%; display: flex; justify-content: end; margin-bottom: 10px">
-            <select id="languageName" name="languageName" required class="select" style="padding-top: 7px; padding-bottom: 7px; outline: none;">
-                <option value="" disabled selected>Select Coding Language</option>
-            </select>
-        </div>
+    <div style="width: 80%; display: flex; justify-content: end; margin-bottom: 10px; gap:10px;">
+
+    <select id="setName"
+            style="padding-top: 7px;
+                   padding-bottom: 7px;
+                   outline: none;">
+
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+
+    </select>
+
+    <select id="languageName"
+            name="languageName"
+            required
+            class="select"
+            style="padding-top: 7px;
+                   padding-bottom: 7px;
+                   outline: none;">
+
+        <option value="" disabled selected>
+            Select Coding Language
+        </option>
+
+    </select>
+
+</div>
 
         <div id="all-questions-wrapper" style="width: 73%;">
-            <!-- MCQs populated dynamically -->
+             MCQs populated dynamically 
         </div>
     </form>
 
-    <!-- Coding Questions -->
+     
     <form action="coding" method="get">
         <div id="all-coding-questions-wrapper" class="all-coding-questions-wrapper">
-            <!-- Coding questions populated dynamically -->
+             Coding questions populated dynamically 
         </div>
     </form>
 
@@ -245,6 +267,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const codingButton = document.getElementById('coding-button');
     const emptyMessage = document.getElementById('empty-message');
     const languageSelect = document.getElementById("languageName");
+    const setName =  document.getElementById("setName").value;
 
     const itemsPerPage = 2;
     let mcqData = [];
@@ -254,7 +277,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!language) return;
         console.log("language is...........", language);
         
-        const url = "<%=request.getContextPath()%>/student/getMcqsByLanguage?languageName=" + language;
+        const url ="<%=request.getContextPath()%>/student/getMcqsByLanguage?languageName="
+            + encodeURIComponent(language)
+            + "&setName="
+            + encodeURIComponent(setName);
         console.log("Fetching MCQs from URL:", url);
 
         fetch(url)
@@ -293,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function() {
             questionDiv.className = 'questions question-item mcq-type';
 
             let optionsHtml = '';
-            const options = item.optionText.split(', ');
+            const options = item.optionText.split(/,\s*(?=[a-z]\.)/);
             options.forEach(opt => {
                 const trimmedOpt = opt.trim();
                 const isCorrect = trimmedOpt.startsWith(item.correctOption + '.');
@@ -485,8 +511,9 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!language) return;
         //console.log("Fetching coding questions for:", language);
 
-        const url = "<%=request.getContextPath()%>/student/getQuestions?languageName=" + language;
-
+        const url ="<%=request.getContextPath()%>/student/getQuestions?languageName="+ encodeURIComponent(language)
+            + "&setName="
+            + encodeURIComponent(setName);
         fetch(url)
             .then(response => {
                 if (!response.ok) throw new Error(`Failed to fetch coding questions: ${response.status}`);

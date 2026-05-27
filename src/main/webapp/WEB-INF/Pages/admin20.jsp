@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Add Language Page</title>
+<title>View Coding</title>
  
 <!-- Chart.js CDN for CandidateAnalytics -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -63,7 +63,7 @@
  
         <!-- Candidate Analytics Content -->
         <div class="content">
-            <jsp:include page="AddExperience.jsp" />
+            <jsp:include page="CodingDisplay.jsp" />
         </div>
     </div>
  

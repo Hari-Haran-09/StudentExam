@@ -115,16 +115,16 @@ h2 {
 </style>
 </head>
 <body class="body">
-
+ 
 <div class="div-img">
   <img src="${pageContext.request.contextPath}/images/logo.png" alt="Logo" width="200" height="70">
 </div>
-
+ 
 <div class="div1">
 <h2>Exam Details</h2>
-
+ 
 <form action="${pageContext.request.contextPath}/student/examScreen" method="get" id="examForm">
-
+ 
 <div class="div2">
   <div class="div2_1">
     <h3>Exam Title</h3>
@@ -132,6 +132,16 @@ h2 {
       <option value="" disabled selected>Select Coding Language</option>
     </select>
   </div>
+  <div class="div2_1">
+    <h3>Select Set</h3>
+    <select id="questionSet" name="questionSet" required class="select">
+        <option value="" disabled selected>Select Set</option>
+        <option value="A">Set A</option>
+        <option value="B">Set B</option>
+        <option value="C">Set C</option>
+        <option value="D">Set D</option>
+    </select>
+</div>
   <div class="div2_1">
     <h3>Exam Duration</h3>
     <p>30 Mins</p>
@@ -145,7 +155,7 @@ h2 {
     <p>3</p>
   </div>
 </div>
-
+ 
 <div class="div3">
   <h4>Exam Instructions</h4>
   <div class="div3_1">
@@ -161,37 +171,37 @@ h2 {
     </ol>
   </div>
 </div>
-
+ 
 <div class="div4">
   <div class="div4_1">
     <input type="checkbox" id="terms" required>
     <p>I accept and agree to the <span class="div4_11">Terms of Use</span></p>
   </div>
 </div>
-
+ 
 <div>
   <button type="submit" class="div5" id="startExamBtn">Start Exam</button>
 </div>
-
+ 
 </form>
-
+ 
 </div>
-
+ 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     setupSecurityMeasures();
 });
-
+ 
 function setupSecurityMeasures() {
     // Prevent context menu
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         return false;
     });
-
+ 
     // Prevent dev tools
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'F12' || 
+        if (e.key === 'F12' ||
             (e.ctrlKey && e.shiftKey && e.key === 'I') ||
             (e.ctrlKey && e.shiftKey && e.key === 'J') ||
             (e.ctrlKey && e.key === 'u')) {
@@ -199,7 +209,7 @@ function setupSecurityMeasures() {
             return false;
         }
     });
-
+ 
     // Detect tab switching
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
@@ -208,7 +218,7 @@ function setupSecurityMeasures() {
         }
     });
 }
-
+ 
 // Form submission
 document.getElementById('examForm').addEventListener('submit', function(e) {
     const termsChecked = document.getElementById('terms').checked;
@@ -226,7 +236,7 @@ document.getElementById('examForm').addEventListener('submit', function(e) {
         return;
     }
 });
-
+ 
 // Fetch Language Name
 fetch("<%=request.getContextPath()%>/student/getLanguage")
     .then(res => res.json())

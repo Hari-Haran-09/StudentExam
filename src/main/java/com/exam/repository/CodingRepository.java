@@ -10,7 +10,7 @@ import com.exam.entity.CodingQuestions;
 
 public interface CodingRepository extends JpaRepository<CodingQuestions, Long> {
 	// Find by language name
-    List<CodingQuestions> findByLanguageName(String languageName);
+//    List<CodingQuestions> findByLanguageName(String languageName);
     
     // Find questions with specific test case count
     @Query("SELECT cq FROM CodingQuestions cq WHERE LENGTH(cq.easyInput) > 0")

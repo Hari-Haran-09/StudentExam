@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -258,17 +257,11 @@ margin-top: 5%;
     border: none;
 	cursor: pointer;
 }
-
-/* Form field error styling */
-.input-error {
-    border: 1px solid #dc3545 !important;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-}
 </style>
 </head>
 <body>
  
-  <div class="stack_boxes box">
+  <div class="stack_boxes.box">
   
   <div class="manage-header" style="display: flex; width: 95%; justify-content: space-between">
     <h1 class="h1">Manage Exams</h1>
@@ -281,17 +274,25 @@ margin-top: 5%;
     <!-- Language Input -->
     <div class="forms">
       <div class="forms-1" style="width: 23%">
-        <p class="text">Programming Language</p>
-        <select class="place" id="languageName" name="languageName" required class="select">
-            <option value="" disabled selected>Select Coding Language</option>
-        </select>
+        <p class="">Programming Language</p>
+        <!--<input class="place" type="text" placeholder="Select the language" id="languageName" name="languageName">-->
+		<select class="place" id="languageName" name="languageName" required class="select">
+								  <option value="" disabled selected>Select Coding Language</option>
+								</select>
       </div>
 
       <!-- Time Duration -->
       <div class="forms-1" style="width: 13%">
         <p class="text-1">Time Duration</p>
-        <div class="move">
-          <input class="time" type="time" value="" name="meetingTime" required>
+        <div class="move" style="">
+          <!-- <label class="h">Time</label> -->
+          <input class="time" type="number" value="" name="meetingTime" required>
+          <!-- <span>:</span>
+          <input class="time" type="time" min="0" max="59" value="0" name="minutes">
+          <label class="h">M</label>
+          <input class="time" type="number" min="0" max="59" value="0" name="seconds1">
+          <span>:</span>
+          <input class="time" type="number" min="0" max="59" value="0" name="seconds2"> -->
         </div>
       </div>
 
@@ -313,11 +314,11 @@ margin-top: 5%;
         <button type="button" class="add-mv-btn" onclick="window.location.href='${pageContext.request.contextPath}/student/mcqQuestions'">+Add MCQ</button>
       </div>
       <div class="download">
-        <button type="button" class="add-down-btn" onclick="window.location.href='${pageContext.request.contextPath}/student/getallmcq'">Download MCQ'S with answer</button>
+        <button type="button" class="add-down-btn" onclick="window.location.href='${pageContext.request.contextPath}/student/getallmcq'">Download MCQ’S with answer</button>
       </div>
 	  <div class="download">
-        <button type="button" class="add-down-btn" onclick="window.location.href='${pageContext.request.contextPath}/student/getallMcqWithoutAnswer'">Download MCQ'S without answer</button>
-      </div>
+	          <button type="button" class="add-down-btn" onclick="window.location.href='${pageContext.request.contextPath}/student/getallMcqWithoutAnswer'">Download MCQ’S without answer</button>
+	        </div>
     </div>
 
     <!-- Coding Questions Section -->
@@ -357,118 +358,91 @@ margin-top: 5%;
   </form>
   <!-- ✅ End of single form -->
 
+  <!-- <div class="terms">
+        By logging in, you agree to our Privacy Policy & Terms of Use
+  </div> -->
+   
   </div>
-
+  <!--<script>
+	fetch("<%=request.getContextPath()%>/student/getLanguage")
+		    .then(res => res.json())
+		    .then(data => {
+		        const languageSelect = document.getElementById("languageName");
+		 
+		        data.forEach(item => {
+		            const opt = document.createElement("option");
+		            opt.value = item.languageName;
+		            opt.textContent = item.languageName;
+		            languageSelect.appendChild(opt);
+		        });
+		    })
+		    .catch(err => console.error("Error fetching languages:", err));
+			
+			document.getElementById("manageexamform").addEventListener("submit", function (e) {
+				    const confirmation = confirm("Do you want to post the data?");
+				    if (!confirmation) {
+				        e.preventDefault();
+				    }
+				});
+  </script>-->
+  
   <script>
-    // Show alert messages from server
-    window.onload = function() {
-        <c:if test="${not empty success}">
-            alert("✅ ${success}");
-        </c:if>
-        <c:if test="${not empty error}">
-            alert("❌ ${error}");
-        </c:if>
-    };
-
-    // Fetch languages for dropdown
-    fetch("<%=request.getContextPath()%>/student/getLanguage")
-        .then(res => res.json())
-        .then(data => {
-            const languageSelect = document.getElementById("languageName");
-            
-            // Clear existing options except the first one
-            while (languageSelect.options.length > 1) {
-                languageSelect.remove(1);
-            }
-            
-            data.forEach(item => {
-                const opt = document.createElement("option");
-                opt.value = item.languageName;
-                opt.textContent = item.languageName;
-                languageSelect.appendChild(opt);
-            });
-        })
-        .catch(err => console.error("Error fetching languages:", err));
-
-    // Form submission handler
-    document.getElementById("manageexamform").addEventListener("submit", function (e) {
-        const languageSelect = document.getElementById("languageName");
-        const selectedLanguage = languageSelect.value;
-        
-        // Validate language selection
-        if (!selectedLanguage) {
-            alert("Please select a programming language");
-            e.preventDefault();
-            languageSelect.classList.add('input-error');
-            return;
-        } else {
-            languageSelect.classList.remove('input-error');
-        }
-        
-        // Validate numeric inputs
-        const numericInputs = document.querySelectorAll('input[type="number"]');
-        let isValid = true;
-        
-        numericInputs.forEach(input => {
-            if (!input.value || input.value <= 0) {
-                input.classList.add('input-error');
-                isValid = false;
-            } else {
-                input.classList.remove('input-error');
-            }
-        });
-        
-        if (!isValid) {
-            alert("Please fill all required fields with valid positive numbers");
-            e.preventDefault();
-            return;
-        }
-        
-        // Time validation
-        const timeInput = document.querySelector('input[type="time"]');
-        if (!timeInput.value) {
-            alert("Please select a time duration");
-            e.preventDefault();
-            timeInput.classList.add('input-error');
-            return;
-        } else {
-            timeInput.classList.remove('input-error');
-        }
-        
-        const confirmation = confirm(`Do you want to save the exam data for ${selectedLanguage}?`);
-        if (!confirmation) {
-            e.preventDefault();
-        }
-    });
-
-    // Real-time validation for numeric inputs
-    document.querySelectorAll('input[type="number"]').forEach(input => {
-        input.addEventListener('input', function() {
-            if (this.value && this.value > 0) {
-                this.classList.remove('input-error');
-            } else {
-                this.classList.add('input-error');
-            }
-        });
-    });
-
-    // Real-time validation for time input
-    document.querySelector('input[type="time"]').addEventListener('change', function() {
-        if (this.value) {
-            this.classList.remove('input-error');
-        } else {
-            this.classList.add('input-error');
-        }
-    });
-
-    // Real-time validation for language select
-    document.getElementById('languageName').addEventListener('change', function() {
-        if (this.value) {
-            this.classList.remove('input-error');
-        } else {
-            this.classList.add('input-error');
-        }
-    });
-  </script>
+      	fetch("<%=request.getContextPath()%>/student/getLanguage")
+      		    .then(res => res.json())
+      		    .then(data => {
+      		        const languageSelect = document.getElementById("languageName");
+   
+      		        data.forEach(item => {
+      		            const opt = document.createElement("option");
+      		            opt.value = item.languageName;
+      		            opt.textContent = item.languageName;
+      		            languageSelect.appendChild(opt);
+      		        });
+      		    })
+      		    .catch(err => console.error("Error fetching languages:", err));
+   
+      	document.getElementById("manageexamform").addEventListener("submit", function (e) {
+      		    const confirmation = confirm("Do you want to post the data?");
+      		    if (!confirmation) {
+      		        e.preventDefault();
+      		    }
+      		});
+   
+      	// Override the onclick behavior - Check MCQ limit before navigating
+      	const addMcqBtn = document.querySelector('.add-mv-btn');
+      	
+      	// Remove the inline onclick attribute
+      	addMcqBtn.removeAttribute('onclick');
+      	
+      	// Add our own click handler
+      	addMcqBtn.addEventListener('click', function(e) {
+      		e.preventDefault();
+      		e.stopPropagation();
+   
+      		const languageName = document.getElementById("languageName").value;
+   
+      		if (!languageName) {
+      			alert("Please select a programming language first!");
+      			return;
+      		}
+   
+      		// Fetch the MCQ limit and current count for the selected language
+      		fetch("<%=request.getContextPath()%>/student/checkMcqLimit?languageName=" + encodeURIComponent(languageName))
+      			.then(res => res.json())
+      			.then(data => {
+      				if (data.limitReached) {
+      					alert("MCQ limit reached for: " + languageName + ". So, You cannot add more MCQs.");
+      					// Do nothing - stay on current page
+      				} else {
+      					// Navigate to MCQ questions page
+      					window.location.href = '${pageContext.request.contextPath}/student/mcqQuestions?languageName=' + encodeURIComponent(languageName);
+      				}
+      			})
+      			.catch(err => {
+      				console.error("Error checking MCQ limit:", err);
+      				alert("Error checking MCQ limit. Please try again.");
+      			});
+      	});
+    </script>
 </body>
 </html>

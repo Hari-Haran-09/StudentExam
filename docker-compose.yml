@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
 
   mysql:
@@ -17,7 +15,7 @@ services:
       - mysql-data:/var/lib/mysql
 
   student-app:
-    build: .
+    image: haran09/studentexam-app:latest
 
     container_name: student-app-container
 
